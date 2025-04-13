@@ -1,0 +1,323 @@
+---
+import { LINKS } from "../lib/constants";
+
+interface Props {
+  title: string;
+  description: string;
+  page?: "travel" | "blog";
+  slug?: string | undefined;
+  pubDate?: string;
+}
+
+const { title, description, page, slug, pubDate } = Astro.props;
+const image =
+  page === "travel"
+    ? `${Astro.url.origin}/globe_preview.webp"`
+    : `${Astro.url.origin}/og-image.png`;
+
+const schema =
+  page !== "blog"
+    ? {
+        "@context": "http://schema.org",
+        "@type": "Person",
+        name: "Harsh Maan",
+        url: Astro.url.origin,
+        sameAs: [LINKS.linkedin, LINKS.github],
+        jobTitle: "Research Data Scientist",
+        worksFor: {
+          "@type": "Organization",
+          name: "Accenture Research",
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Hyderabad",
+            addressCountry: "IN",
+          },
+        },
+        nationality: {
+          "@type": "Country",
+          name: "India",
+        },
+      }
+    : {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": `${Astro.url.origin}/blog/${slug}`,
+        },
+        headline: title || title,
+        description: description || title,
+        image: `${Astro.url.origin}/og-image.png`,
+        author: {
+          "@type": "Person",
+          name: "Harsh Maan",
+          url: Astro.url.origin,
+          sameAs: [LINKS.linkedin, LINKS.github],
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "Harsh Maan",
+          logo: {
+            "@type": "ImageObject",
+            url: `${Astro.url.origin}/og-image.png`,
+          },
+        },
+        datePublished: pubDate || new Date().toISOString(),
+        dateModified: pubDate || new Date().toISOString(),
+      };
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width" name="viewport" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta content={Astro.generator} name="generator" />
+    <title>{title}</title>
+    <meta content={description} name="description" />
+    <meta content="index, follow" name="robots" />
+
+    <meta content={title} property="og:title" />
+    <meta content={description} property="og:description" />
+    <meta content="website" property="og:type" />
+    <meta content={Astro.url.origin} property="og:url" />
+    <meta content={image} property="og:image" />
+
+    <meta content="summary_large_image" name="twitter:card" />
+    <meta content={title} name="twitter:title" />
+    <meta content={description} name="twitter:description" />
+    <meta content={image} name="twitter:image" />
+
+    <link href="https://cdn.fontshare.com" rel="preconnect" />
+    <script
+      is:inline
+      set:html={JSON.stringify(schema)}
+      type="application/ld+json"
+    />
+    <script src="/chat.js" defer></script>
+    <script src="/voicechat.js" defer></script>
+  </head>
+  <body class="bg-darkslate-700 md:h-screen flex flex-col justify-center items-center">
+    <slot name="loader" />
+    <slot />
+
+    <!-- Gemini Chat Modal -->
+    <div id="chatbox-modal" class="fixed bottom-4 right-4 bg-neutral-900 text-white w-[350px] h-[500px] rounded-xl shadow-lg border border-neutral-700 z-50 hidden flex flex-col overflow-hidden" style="display: none;">
+      <div class="flex justify-between items-center px-4 py-2 border-b border-neutral-700">
+        <h3 class="text-sm font-semibold">Ask me anything 💡</h3>
+        <button
+          id="chatbox-close"
+          class="text-sm text-gray-400 hover:text-white"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-2 text-sm">
+        <p class="text-gray-400">Hi! Ask me anything about AI, data science, or my work. 😊</p>
+      </div>
+
+      <form id="chat-form" class="border-t border-neutral-700 p-2 flex" onSubmit="return false;">
+        <input
+          id="chat-input"
+          type="text"
+          class="flex-1 bg-neutral-800 text-white p-2 rounded-l-md outline-none"
+          placeholder="Type a message..."
+        />
+        <button
+          type="submit"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-3 rounded-r-md"
+        >
+          ➔
+        </button>
+      </form>
+    </div>
+    <div id="voicebox-modal" class="fixed bottom-4 right-4 bg-neutral-900 text-white w-[350px] h-[500px] rounded-xl shadow-lg border border-neutral-700 z-50 hidden flex flex-col overflow-hidden">
+      <div class="flex justify-between items-center px-4 py-2 border-b border-neutral-700">
+        <h3 class="text-sm font-semibold">Ask & Hear Voice 🔊</h3>
+        <button
+          id="voicebox-close"
+          class="text-sm text-gray-400 hover:text-white"
+        >
+          ✕
+        </button>
+      </div>
+    
+      <div id="voicebox-messages" class="flex-1 p-4 overflow-y-auto space-y-2 text-sm">
+        <p class="text-gray-400">Hi! Ask anything — and I’ll reply in voice. 🎙️</p>
+      </div>
+    
+      <form id="voicebox-form" class="border-t border-neutral-700 p-2 flex" onSubmit="return false;">
+        <input
+          id="voicebox-input"
+          type="text"
+          class="flex-1 bg-neutral-800 text-white p-2 rounded-l-md outline-none"
+          placeholder="Type your question..."
+        />
+        <button
+          type="submit"
+          class="bg-green-600 hover:bg-green-700 text-white px-3 rounded-r-md"
+        >
+          🎤
+        </button>
+      </form>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+
+  .voice-anim {
+    display: flex;
+    align-items: flex-end;
+    height: 1rem;
+  }
+  
+  .bar {
+    width: 4px;
+    height: 100%;
+    background: #ffffff; /* ← white bars */
+    border-radius: 2px;
+    animation: bounce 1s infinite ease-in-out;
+  }
+  
+  .bar1 {
+    animation-delay: 0s;
+  }
+  .bar2 {
+    animation-delay: 0.2s;
+  }
+  .bar3 {
+    animation-delay: 0.4s;
+  }
+  
+  @keyframes bounce {
+    0%, 100% {
+      transform: scaleY(0.4);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+
+  #chat-messages {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .chat-bubble {
+    max-width: 85%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+  
+  .chat-bubble.user {
+    background-color: #2e2e2e;
+    border: 1px solid #3f3f3f;
+    align-self: flex-end;
+    text-align: right;
+    border-top-right-radius: 0;
+  }
+  
+  .chat-bubble.bot {
+    background-color: #1e1e1e;
+    border: 1px solid #333333;
+    align-self: flex-start;
+    text-align: left;
+    border-top-left-radius: 0;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  .shimmer-glow {
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.5),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s linear infinite;
+  }
+
+
+  
+  .animate-flow {
+    animation: flow 1s ease-out forwards;
+    will-change: transform;
+  }
+
+  @font-face {
+    font-family: "CabinetGrotesk";
+    src: url("/fonts/CabinetGrotesk-Variable.ttf") format("truetype-variations");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 1000;
+  }
+  @font-face {
+    font-family: "Satoshi";
+    src: url("/fonts/Satoshi-Variable.ttf") format("truetype-variations");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 1000;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Satoshi", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Cabinet Grotesk", sans-serif;
+  }
+  p {
+    font-family: "Satoshi";
+  }
+
+  b {
+    font-weight: 700 !important;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-size: 40px 40px;
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    z-index: -1;
+    animation: whiteGridGlow 2s infinite ease-in-out;
+    pointer-events: none;
+    opacity: 0.35; /* Subtle but visible */
+  }
+  
+  @keyframes whiteGridGlow {
+    0%, 100% {
+      filter: brightness(1);
+    }
+    50% {
+      filter: brightness(1.7);
+    }
+  }
+</style>
