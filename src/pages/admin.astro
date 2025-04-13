@@ -1,5 +1,4 @@
 ---
-// already using BasicLayout
 import BasicLayout from "../layouts/BasicLayout.astro";
 ---
 
@@ -8,11 +7,15 @@ import BasicLayout from "../layouts/BasicLayout.astro";
     <h1 class="text-3xl font-bold">🛠️ Admin Panel</h1>
     <p class="text-neutral-400">This is a placeholder for future AI-powered dashboard controls.</p>
 
-    <a
-      href="/"
-      class="mt-4 inline-block px-4 py-2 border border-neutral-700 rounded-lg text-sm hover:bg-neutral-800 transition"
-    >
-      ← Back to Home
-    </a>
+    <form method="POST" action="/api/logout">
+      <button
+        type="submit"
+        class="mt-4 inline-block px-4 py-2 border border-neutral-700 rounded-lg text-sm hover:bg-neutral-800 transition"
+      >
+        Logout
+      </button>
+    </form>
+
+    <a href="/" class="text-sm text-neutral-400 hover:text-white mt-2">← Back to Home</a>
   </main>
 </BasicLayout>
