@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ✅ Force hide on initial load
   if (modal) {
-    chatModal.style.display = "none";
+    modal.style.display = "none";
   }
 
   openBtn.addEventListener("click", () => {
