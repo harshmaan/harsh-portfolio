@@ -1,37 +1,34 @@
 document.addEventListener("DOMContentLoaded", () => {
   const openBtn = document.getElementById("play-voice-btn");
   const modal = document.getElementById("voicebox-modal");
+
+  // ✅ Only run if both modal and trigger button exist
+  if (!openBtn || !modal) return;
+
   const closeBtn = document.getElementById("voicebox-close");
   const form = document.getElementById("voicebox-form");
   const input = document.getElementById("voicebox-input");
   const messages = document.getElementById("voicebox-messages");
 
-  if (modal) {
-    modal.style.display = "none";
-  }
+  modal.style.display = "none";
 
-  // Open modal
-  openBtn?.addEventListener("click", () => {
+  openBtn.addEventListener("click", () => {
     modal.style.display = "flex";
   });
 
-  // Close modal
   closeBtn?.addEventListener("click", () => {
     modal.style.display = "none";
   });
 
-  // Form submit logic
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const userMsg = input.value.trim();
     if (!userMsg) return;
 
-    // 🚫 Disable input and button
     input.disabled = true;
     const submitBtn = form.querySelector("button");
     submitBtn?.setAttribute("disabled", "true");
 
-    // Show user bubble
     const userEl = document.createElement("div");
     userEl.className = "chat-bubble user";
     userEl.innerHTML = `<p>🧑 ${userMsg}</p>`;
@@ -70,28 +67,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const rawReply = (await res.json()).response || "Sorry, I’ve got nothing.";
 
-      // 🧼 Clean the LLM output
       const botReply = rawReply
         .replace(/[^\w\s.,!?'"-]/g, "")
         .replace(/\s+/g, " ")
         .replace(/[*_~`>#]/g, "")
         .trim();
 
-      // Show bot speaking placeholder
       const botEl = document.createElement("div");
       botEl.className = "chat-bubble bot";
       botEl.innerHTML = `
-      <p>🤖 Speaking… listen up! 🎧</p>
-      <div class="voice-anim mt-2 flex gap-1">
-        <div class="bar bar1"></div>
-        <div class="bar bar2"></div>
-        <div class="bar bar3"></div>
-      </div>
+        <p>🤖 Speaking… listen up! 🎧</p>
+        <div class="voice-anim mt-2 flex gap-1">
+          <div class="bar bar1"></div>
+          <div class="bar bar2"></div>
+          <div class="bar bar3"></div>
+        </div>
       `;
       messages.appendChild(botEl);
       messages.scrollTop = messages.scrollHeight;
 
-      // ElevenLabs TTS
       const audioRes = await fetch("/api/elevenlabs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -105,12 +99,10 @@ document.addEventListener("DOMContentLoaded", () => {
       audio.onended = () => {
         input.disabled = false;
         submitBtn?.removeAttribute("disabled");
-        const anim = botEl.querySelector(".voice-anim");
-        if (anim) anim.remove();
+        botEl.querySelector(".voice-anim")?.remove();
       };
 
       await audio.play();
-
     } catch (err) {
       console.error("Voicechat error:", err);
       input.disabled = false;
