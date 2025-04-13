@@ -136,6 +136,39 @@ const schema =
 </html>
 
 <style is:global>
+
+  #chat-messages {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .chat-bubble {
+    max-width: 85%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+  
+  .chat-bubble.user {
+    background-color: #2e2e2e;
+    border: 1px solid #3f3f3f;
+    align-self: flex-end;
+    text-align: right;
+    border-top-right-radius: 0;
+  }
+  
+  .chat-bubble.bot {
+    background-color: #1e1e1e;
+    border: 1px solid #333333;
+    align-self: flex-start;
+    text-align: left;
+    border-top-left-radius: 0;
+  }
+
   @font-face {
     font-family: "CabinetGrotesk";
     src: url("/fonts/CabinetGrotesk-Variable.ttf") format("truetype-variations");
