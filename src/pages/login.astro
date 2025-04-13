@@ -7,7 +7,7 @@ const showError = url.searchParams.get("error") === "1";
 <BasicLayout title="Login" description="Secure login to access admin features.">
   <style is:global>
     @keyframes pulse-once {
-      0% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.4); }
+      0% { box-shadow: 0 0 25px rgba(255, 255, 255, 0.4); }
       100% { box-shadow: none; }
     }
     .animate-pulse-once {
@@ -16,15 +16,15 @@ const showError = url.searchParams.get("error") === "1";
   </style>
 
   <main class="relative text-white flex flex-col items-center justify-center w-full h-screen gap-4 bg-gradient-to-b from-neutral-950 to-black">
-    <h1 class="text-3xl font-extrabold tracking-wide uppercase text-red-500 drop-shadow">
-      🛡️ Restricted Access Only
+    <h1 class="text-3xl font-extrabold tracking-wide uppercase text-white drop-shadow">
+      Restricted Access Only
     </h1>
 
     {showError && (
-      <p class="text-red-500 text-sm">Access Denied.</p>
+      <p class="text-white text-sm">Access Denied.</p>
     )}
 
-    <form method="POST" action="/api/login" class="flex flex-col gap-4 w-full max-w-sm border border-red-600 bg-neutral-900 bg-opacity-80 rounded-xl p-6 shadow-lg backdrop-blur-md animate-pulse-once">
+    <form method="POST" action="/api/login" class="flex flex-col gap-4 w-full max-w-sm border border-white bg-neutral-900 bg-opacity-80 rounded-xl p-6 shadow-lg backdrop-blur-md animate-pulse-once">
       <input
         type="text"
         name="id"
@@ -41,18 +41,9 @@ const showError = url.searchParams.get("error") === "1";
       />
       <button
         type="submit"
-        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-semibold shadow-md hover:shadow-red-500/50 transition"
+        class="bg-white hover:bg-neutral-200 text-black px-4 py-2 rounded font-semibold shadow-md transition"
       >
         Enter
-      </button>
-    </form>
-
-    <form method="POST" action="/api/logout">
-      <button
-        type="submit"
-        class="text-sm text-neutral-400 hover:text-white mt-2 underline"
-      >
-        ← Logout
       </button>
     </form>
 
