@@ -1,7 +1,8 @@
+// ✅ Astro API route syntax
 import type { APIRoute } from 'astro';
 import { GenerativeModel } from '@google/generative-ai';
 
-const GEMINI_API_KEY = import.meta.env.GEMINI_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -22,13 +23,12 @@ export const POST: APIRoute = async ({ request }) => {
     const result = await model.generateContent(prompt);
 
     if (!result || !result.response) {
-      console.error("❌ No response from model:", result);
-      return new Response(JSON.stringify({ response: "Empty response." }), {
+      return new Response(JSON.stringify({ response: "Empty response from Gemini." }), {
         status: 500,
       });
     }
 
-    const text = result.response.text();
+    const text = await result.response.text(); // Note the await!
     return new Response(JSON.stringify({ response: text }), {
       status: 200,
     });
