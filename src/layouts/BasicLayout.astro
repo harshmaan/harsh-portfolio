@@ -169,14 +169,27 @@ const schema =
     border-top-left-radius: 0;
   }
 
-  @keyframes flow {
+  @keyframes shimmer {
     0% {
-      transform: translateX(-100%);
+      background-position: -200% 0;
     }
     100% {
-      transform: translateX(0%);
+      background-position: 200% 0;
     }
   }
+  
+  .shimmer-bar {
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: shimmer 2s linear infinite;
+  }
+
   
   .animate-flow {
     animation: flow 1s ease-out forwards;
