@@ -12,24 +12,21 @@ const percentOfDay = Math.floor((totalMinutes / 1440) * 100);
 ---
 
 <Card colSpan="md:col-span-1" rowSpan="md:row-span-1">
-  <div class="flex justify-between w-full items-start mb-2">
-    <div class="flex flex-col">
+  <div class="h-full flex flex-col justify-start">
+    <div class="flex justify-between w-full items-start mb-2">
       <h2 class="text-lg font-semibold text-white">Live Feed</h2>
+      <Pulse />
     </div>
-    <Pulse />
-  </div>
 
-  <p class="text-sm text-white mb-2">{status}</p>
+    <p class="text-sm text-white mb-2">{status}</p>
 
-  <!-- Progress Bar -->
-  <div class="h-2 bg-white/20 rounded-full overflow-hidden relative">
-    <!-- Filled part of the bar -->
-    <div
-      class="h-full bg-white/30 rounded-full transition-all duration-700 relative"
-      style={`width: ${percentOfDay}%`}
-    >
-      <!-- Shimmer overlay inside the filled portion -->
-      <div class="absolute inset-0 shimmer-glow rounded-full"></div>
+    <div class="h-2 bg-white/20 rounded-full overflow-hidden relative">
+      <div
+        class="h-full bg-white/30 rounded-full transition-all duration-700 relative"
+        style={`width: ${percentOfDay}%`}
+      >
+        <div class="absolute inset-0 shimmer-glow rounded-full"></div>
+      </div>
     </div>
   </div>
 </Card>
