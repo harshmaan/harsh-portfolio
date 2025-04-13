@@ -51,7 +51,6 @@ const posts = (await getCollection("blog"))?.sort(
     <ContactsCard />
     <TimeZone />
     <Now />
-    <AwardsCard />
     <Card
       colorText="text-neutral-900"
       colSpan="md:col-span-1"
@@ -63,6 +62,7 @@ const posts = (await getCollection("blog"))?.sort(
         <Globe client:load />
       </div>
     </Card>
+    <AwardsCard />
     <Card
       colSpan="md:col-span-1"
       href="/blog"
