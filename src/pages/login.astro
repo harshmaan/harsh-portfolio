@@ -1,10 +1,17 @@
 ---
 import BasicLayout from "../layouts/BasicLayout.astro";
+const url = new URL(Astro.request.url);
+const showError = url.searchParams.get("error") === "1";
 ---
 
 <BasicLayout title="Login" description="Secure login to access admin features.">
   <main class="text-white flex flex-col items-center justify-center w-full h-screen gap-4">
     <h1 class="text-2xl font-bold">🔐 Admin Login</h1>
+
+    {showError && (
+      <p class="text-red-500 text-sm">Access Denied.</p>
+    )}
+
     <form method="POST" action="/api/login" class="flex flex-col gap-4 w-full max-w-sm">
       <input
         type="text"
