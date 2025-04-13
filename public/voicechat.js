@@ -21,71 +21,91 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Form submit logic
-  form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const userMsg = input.value.trim();
-    if (!userMsg) return;
+form?.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    // Show user bubble
-    const userEl = document.createElement("div");
-    userEl.className = "chat-bubble user";
-    userEl.innerHTML = `<p>🧑 ${userMsg}</p>`;
-    messages.appendChild(userEl);
+  const userMsg = input.value.trim();
+  if (!userMsg) return;
+
+  // 🚫 Disable input and button during processing
+  input.disabled = true;
+  form.querySelector("button")?.setAttribute("disabled", "true");
+
+  // Show user bubble
+  const userEl = document.createElement("div");
+  userEl.className = "chat-bubble user";
+  userEl.innerHTML = `<p>🧑 ${userMsg}</p>`;
+  messages.appendChild(userEl);
+  messages.scrollTop = messages.scrollHeight;
+  input.value = '';
+
+  try {
+    const fullPrompt = `
+      You are a senior data scientist impersonating Harsh Maan — an expert in AI, machine learning, and data science...
+
+      Now, answer this user query as Harsh Maan:
+      "${userMsg}"
+    `;
+
+    const res = await fetch("/api/gemini", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: fullPrompt }),
+    });
+
+    let rawReply = (await res.json()).response || "Sorry, I’ve got nothing.";
+
+    // ✅ Sanitize special characters
+    const botReply = rawReply
+      .replace(/[^\w\s.,!?'"-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    // Show placeholder message
+    const botEl = document.createElement("div");
+    botEl.className = "chat-bubble bot";
+    botEl.innerHTML = `<p>🤖 Speaking… listen up! 🎧</p>`;
+    messages.appendChild(botEl);
     messages.scrollTop = messages.scrollHeight;
-    input.value = '';
 
+    // 🔊 Send to ElevenLabs
+    const audioRes = await fetch("/api/elevenlabs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: botReply }),
+    });
+
+    const audioBlob = await audioRes.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+
+    // 🟢 Re-enable input after audio ends
+    audio.onended = () => {
+      input.disabled = false;
+      form.querySelector("button")?.removeAttribute("disabled");
+    };
+
+    // Try auto-play
     try {
-      const fullPrompt = `
-        You are a senior data scientist impersonating Harsh Maan — an expert in AI, machine learning, and data science, known for building intelligent systems and sharing thought leadership in the field.
+      await audio.play();
+    } catch {
+      // On blocked autoplay, show manual play button
+      const playBtn = document.createElement("button");
+      playBtn.textContent = "▶️ Play Response";
+      playBtn.className = "text-sm text-green-400 underline hover:text-green-200";
+      playBtn.onclick = () => {
+        audio.currentTime = 0;
+        audio.play();
+      };
+      botEl.appendChild(playBtn);
 
-        You should only respond to questions related to:
-        – AI, machine learning, data science, or related technical topics  
-        – Harsh Maan’s background, skills, experience, or public projects  
-        
-        Harsh Maan background Data: 
-        Data Scientist at Accenture Research with ~4 years’ combined data‑science and engineering experience, skilled in Python, LangChain/LangGraph agents & RAG, Snowflake, Databricks, SQL, Power BI, and Azure OpenAI. Designed LLM‑driven agents that cut peer‑review cycles by 60 %, modernized dozens of ETL pipelines and BI reports to cloud platforms, and built Bayesian/Monte‑Carlo demand‑forecasting models used across 10 countries. Holds a B.Tech in Software Engineering (SRM), an NUS‑HPE data‑science internship (A+), and certifications from Databricks, Microsoft, and Azure; recipient of multiple corporate innovation awards and author of two IJCST papers on cancer detection and explainable churn prediction.
-        
-        Guidelines-
-        1. If the question falls outside these topics, politely decline to answer.
-        2. Always respond in first person tone.
-        3. Always add a touch of humorm puns, or light sarcasm — keep it clever and human.
-        4. Keep answers short. Be clear and concise. 
-        5. Use markdown formatting — include lists, bold text, code blocks, etc. when helpful.
-        
-        Now, answer this user query as Harsh Maan:
-        
-        "${userMsg}"
-              `;
-
-      const res = await fetch("/api/gemini", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: fullPrompt }),
-      });
-
-      const data = await res.json();
-      const botReply = data.response || "Sorry, I’ve got nothing.";
-
-      // Show bot reply
-      const botEl = document.createElement("div");
-      botEl.className = "chat-bubble bot";
-      botEl.innerHTML = `<p>🤖 Speaking… listen up! 🎧</p>`;
-      messages.appendChild(botEl);
-      messages.scrollTop = messages.scrollHeight;
-
-      // ElevenLabs TTS
-      const audioRes = await fetch("/api/elevenlabs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: botReply }),
-      });
-
-      const audioBlob = await audioRes.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      audio.play();
-    } catch (err) {
-      console.error("Voicechat error:", err);
+      // Still re-enable so user isn’t stuck
+      input.disabled = false;
+      form.querySelector("button")?.removeAttribute("disabled");
     }
-  });
+  } catch (err) {
+    console.error("Voicechat error:", err);
+    input.disabled = false;
+    form.querySelector("button")?.removeAttribute("disabled");
+  }
 });
