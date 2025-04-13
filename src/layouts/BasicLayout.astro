@@ -169,6 +169,20 @@ const schema =
     border-top-left-radius: 0;
   }
 
+  @keyframes flow {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(0%);
+    }
+  }
+  
+  .animate-flow {
+    animation: flow 1s ease-out forwards;
+    will-change: transform;
+  }
+
   @font-face {
     font-family: "CabinetGrotesk";
     src: url("/fonts/CabinetGrotesk-Variable.ttf") format("truetype-variations");
