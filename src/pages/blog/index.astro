@@ -30,11 +30,13 @@ const posts = (await getCollection("blog"))?.sort(
       >Back</a
     >
     <h1 class="text-4xl font-bold mb-4 text-neutral-100">Posts</h1>
-    <ul class="w-full">
+    <ul class="w-full max-h-48 overflow-y-auto pr-2">
       {
         posts?.map((post) => (
           <PostRow
-            date={post.data.pubDate || new Date()}             id={post.id}             title={post.data.title || "No title"}
+            date={post.data.pubDate || new Date()}
+            id={post.id}
+            title={post.data.title || "No title"}
           />
         ))
       }
