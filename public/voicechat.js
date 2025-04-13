@@ -12,16 +12,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Open modal
   openBtn?.addEventListener("click", () => {
-    if (modal) {
-      modal.style.display = "flex";
-    }
+    modal.style.display = "flex";
   });
 
   // Close modal
   closeBtn?.addEventListener("click", () => {
-    if (modal) {    
-      modal.style.display = "none";
-    }
+    modal.style.display = "none";
   });
 
   // Form submit logic
