@@ -47,7 +47,7 @@ const schema =
         },
         headline: title || title,
         description: description || title,
-        image: `${Astro.url.origin}/og-image.png`, //TODO: dynamic
+        image: `${Astro.url.origin}/og-image.png`,
         author: {
           "@type": "Person",
           name: "Harsh Maan",
@@ -77,46 +77,61 @@ const schema =
     <title>{title}</title>
     <meta content={description} name="description" />
     <meta content="index, follow" name="robots" />
-    <!-- Basic OG tags for sharing your website's content on platforms like Facebook and LinkedIn -->
+
     <meta content={title} property="og:title" />
     <meta content={description} property="og:description" />
     <meta content="website" property="og:type" />
     <meta content={Astro.url.origin} property="og:url" />
-    <meta
-      content={image || `${Astro.url.origin}/og-image.png`}
-      property="og:image"
-    />
-    <!-- Basic Twitter Card tags -->
+    <meta content={image} property="og:image" />
+
     <meta content="summary_large_image" name="twitter:card" />
     <meta content={title} name="twitter:title" />
     <meta content={description} name="twitter:description" />
-    <meta
-      content={image || `${Astro.url.origin}/og-image.png`}
-      name="twitter:image"
-    />
+    <meta content={image} name="twitter:image" />
 
     <link href="https://cdn.fontshare.com" rel="preconnect" />
-    {
-      page === "travel" && (
-        <link href={`${Astro.url.origin}/travel`} rel="canonical" />
-      )
-    }
-    {
-      page === "blog" && (
-        <link href={`${Astro.url.origin}/blog/${slug}`} rel="canonical" />
-      )
-    }
     <script
       is:inline
       set:html={JSON.stringify(schema)}
       type="application/ld+json"
     />
+    <script src="/chat.js" defer></script>
   </head>
-  <body
-    class="bg-darkslate-700 md:h-screen flex flex-col justify-center items-center"
-  >
+  <body class="bg-darkslate-700 md:h-screen flex flex-col justify-center items-center">
     <slot name="loader" />
     <slot />
+
+    <!-- Gemini Chat Modal -->
+    <div id="chatbox-modal" class="fixed bottom-4 right-4 bg-neutral-900 text-white w-[350px] h-[500px] rounded-xl shadow-lg border border-neutral-700 z-50 hidden flex flex-col overflow-hidden">
+      <div class="flex justify-between items-center px-4 py-2 border-b border-neutral-700">
+        <h3 class="text-sm font-semibold">Ask me anything 💡</h3>
+        <button
+          onClick="document.getElementById('chatbox-modal').classList.add('hidden')"
+          class="text-sm text-gray-400 hover:text-white"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-2 text-sm">
+        <p class="text-gray-400">Hi! Ask me anything about AI, data science, or my work. 😊</p>
+      </div>
+
+      <form id="chat-form" class="border-t border-neutral-700 p-2 flex" onSubmit="return false;">
+        <input
+          id="chat-input"
+          type="text"
+          class="flex-1 bg-neutral-800 text-white p-2 rounded-l-md outline-none"
+          placeholder="Type a message..."
+        />
+        <button
+          type="submit"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-3 rounded-r-md"
+        >
+          ➔
+        </button>
+      </form>
+    </div>
   </body>
 </html>
 
