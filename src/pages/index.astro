@@ -9,6 +9,7 @@ import Now from "../components/Now.astro";
 import Globe from "../components/Globe";
 import { getCollection } from "astro:content";
 import { formatDate } from "../lib/helpers";
+import AwardsCard from "../components/AwardsCard.astro";
 
 const posts = (await getCollection("blog"))?.sort(
   (blogEntryA, blogEntryB) =>
@@ -50,6 +51,7 @@ const posts = (await getCollection("blog"))?.sort(
     <ContactsCard />
     <TimeZone />
     <Now />
+    <AwardsCard />
     <Card
       colorText="text-neutral-900"
       colSpan="md:col-span-1"
