@@ -1,0 +1,32 @@
+---
+import BasicLayout from "../layouts/BasicLayout.astro";
+---
+
+<BasicLayout title="Login" description="Secure login to access admin features.">
+  <main class="text-white flex flex-col items-center justify-center w-full h-screen gap-4">
+    <h1 class="text-2xl font-bold">🔐 Admin Login</h1>
+    <form method="POST" action="/api/login" class="flex flex-col gap-4 w-full max-w-sm">
+      <input
+        type="text"
+        name="id"
+        placeholder="Enter ID"
+        class="bg-neutral-900 text-white px-4 py-2 rounded border border-neutral-700 focus:outline-none focus:ring"
+        required
+      />
+      <input
+        type="password"
+        name="password"
+        placeholder="Enter Password"
+        class="bg-neutral-900 text-white px-4 py-2 rounded border border-neutral-700 focus:outline-none focus:ring"
+        required
+      />
+      <button
+        type="submit"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold"
+      >
+        Login
+      </button>
+    </form>
+    <a href="/" class="text-sm text-neutral-400 hover:text-white mt-2">← Back to Home</a>
+  </main>
+</BasicLayout>
