@@ -24,8 +24,13 @@ document.getElementById('chat-form')?.addEventListener('submit', async (e) => {
   const data = await res.json();
 
   const botEl = document.createElement('p');
-  botEl.innerText = "🤖 " + (data.reply || "Hmm... something went wrong.");
+  botEl.innerText = "🤖 " + (data.response || "Hmm... something went wrong.");
   messages.appendChild(botEl);
 
   messages.scrollTop = messages.scrollHeight;
+});
+
+  closeBtn?.addEventListener('click', () => {
+    document.getElementById('chatbox-modal')?.classList.add('hidden');
+  });
 });
