@@ -1,6 +1,9 @@
 ---
 import Card from "./Card/index.astro";
 import Pulse from "./Pulse.astro";
+import { getCurrentStatus } from "../lib/helpers";
+
+const status = getCurrentStatus();
 ---
 
 <Card colSpan="md:col-span-1" rowSpan="md:row-span-2">
@@ -13,5 +16,5 @@ import Pulse from "./Pulse.astro";
     </div>
     <Pulse />
   </div>
-  <p class="text-xs">Currently working fulltime</p>
+  <p class="text-xs">{status}</p>
 </Card>
