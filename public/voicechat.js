@@ -13,11 +13,13 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!openBtn || !modal || !closeBtn || !form || !input || !messages) return;
 
   openBtn.addEventListener("click", () => {
-    modal.style.display = "flex";
+    modal.classList.remove("hidden"); // show
+    modal.classList.add("flex");      // restore flex layout
   });
 
   closeBtn.addEventListener("click", () => {
-    modal.style.display = "none";
+    modal.classList.remove("flex");
+    modal.classList.add("hidden");    // hide
   });
 
   form.addEventListener("submit", async (e) => {
