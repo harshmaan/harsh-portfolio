@@ -6,7 +6,13 @@ document.addEventListener("DOMContentLoaded", () => {
    const input = document.getElementById("voicebox-input");
    const messages = document.getElementById("voicebox-messages");
 
-   if (!openBtn || !modal || !closeBtn || !form || !input || !messages) return;
+  if (!openBtn || !modal || !closeBtn || !form || !input || !messages) {
+    if (modal) modal.style.display = "none";
+    return;
+  }
+
+  // ✅ On home page — initialize the logic
+  modal.style.display = "none";
 
    if (modal) {
      modal.style.display = "none";
