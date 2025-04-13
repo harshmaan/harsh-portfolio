@@ -3,6 +3,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("chat-input");
   const messages = document.getElementById("chat-messages");
   const closeBtn = document.getElementById("chatbox-close");
+  const chatModal = document.getElementById("chatbox-modal");
+  const chatOpenBtn = document.querySelector("[onClick]"); // targets your button with onClick
+
+  // Safely add listener to open chat modal
+  chatOpenBtn?.addEventListener("click", () => {
+    chatModal?.classList.remove("hidden");
+  });
+
+  // Close modal when clicking ✕
+  closeBtn?.addEventListener("click", () => {
+    chatModal?.classList.add("hidden");
+  });
 
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -31,9 +43,5 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.error("Chat error:", err);
     }
-  });
-
-  closeBtn?.addEventListener("click", () => {
-    document.getElementById("chatbox-modal")?.classList.add("hidden");
   });
 });
