@@ -5,7 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
    const form = document.getElementById("voicebox-form");
    const input = document.getElementById("voicebox-input");
    const messages = document.getElementById("voicebox-messages");
- 
+
+   if (!openBtn || !modal || !closeBtn || !form || !input || !messages) return;
+
    if (modal) {
      modal.style.display = "none";
    }
