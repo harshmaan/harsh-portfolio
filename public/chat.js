@@ -1,6 +1,5 @@
-import { marked } from "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
-
 document.addEventListener("DOMContentLoaded", () => {
+  import { marked } from "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
   const form = document.getElementById("chat-form");
   const input = document.getElementById("chat-input");
   const messages = document.getElementById("chat-messages");
