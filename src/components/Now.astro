@@ -22,10 +22,14 @@ const percentOfDay = Math.floor((totalMinutes / 1440) * 100);
   <p class="text-xs mb-2">{status}</p>
 
   <!-- Progress Bar -->
-  <div class="h-2 bg-white/20 rounded-full overflow-hidden">
+  <div class="h-2 bg-white/20 rounded-full overflow-hidden relative">
+    <!-- Filled part of the bar -->
     <div
-      class="h-full bg-white/30 shimmer-bar transition-all duration-700 rounded-full"
+      class="h-full bg-white/30 rounded-full transition-all duration-700 relative"
       style={`width: ${percentOfDay}%`}
-    ></div>
+    >
+      <!-- Shimmer overlay inside the filled portion -->
+      <div class="absolute inset-0 shimmer-glow rounded-full"></div>
+    </div>
   </div>
 </Card>
