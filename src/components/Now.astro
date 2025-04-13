@@ -4,6 +4,11 @@ import Pulse from "./Pulse.astro";
 import { getCurrentStatus } from "../lib/helpers";
 
 const status = getCurrentStatus();
+
+// Calculate percentage of day complete (for bar width)
+const now = new Date();
+const totalMinutes = now.getHours() * 60 + now.getMinutes();
+const percentOfDay = Math.floor((totalMinutes / 1440) * 100);
 ---
 
 <Card colSpan="md:col-span-1" rowSpan="md:row-span-1">
@@ -13,5 +18,14 @@ const status = getCurrentStatus();
     </div>
     <Pulse />
   </div>
-  <p class="text-xs">{status}</p>
+
+  <p class="text-xs mb-2">{status}</p>
+
+  <!-- Progress Bar -->
+  <div class="h-2 bg-white/20 rounded-full overflow-hidden">
+    <div
+      class="h-full bg-white animate-flow rounded-full transition-all duration-700"
+      style={`width: ${percentOfDay}%`}
+    ></div>
+  </div>
 </Card>
