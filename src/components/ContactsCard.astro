@@ -15,22 +15,15 @@ import { LINKS } from "../lib/constants";
       <p>admin@harshmaan.com</p>
       <p>Hyderabad, India</p>
     </address>
-    <div class="flex flex-col mt-4 w-fit">
-      <h2 class="text-gray-500">Socials</h2>
-      <ul>
-        <li>
-          <a href={LINKS.linkedin} target="_blank">Linkedin</a>
-        </li>
-        <li>
-          <a href={LINKS.github} target="_blank">Github</a>
-        </li>
-        <li>
-          <a href={LINKS.medium} target="_blank">Medium</a>
-        </li>
-        <li>
-          <a href={LINKS.discord} target="_blank">Discord</a>
-        </li>
-      </ul>
-    </div>
+    <!-- Chat Trigger Button -->
+    <button
+      class="mt-4 w-full bg-neutral-800 border border-neutral-700 text-white py-2 px-4 rounded-lg hover:bg-neutral-700 transition"
+      onClick={() => {
+        const chatModal = document.getElementById('chatbox-modal');
+        chatModal?.classList.remove('hidden');
+      }}
+    >
+      💬 Chat with me – powered by Gemini AI
+    </button>    
   </div>
 </Card>
