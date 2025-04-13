@@ -40,19 +40,19 @@ export function getCurrentStatus(): string {
     now.toLocaleString("en-US", { hour: "numeric", hour12: false, timeZone: "Asia/Kolkata" })
   );
 
-  if (hourIST >= 6 && hourIST < 9) {
-    return "🏃 Getting those gains! (At the gym)";
+  if (hourIST >= 8 && hourIST < 9) {
+    return "🚿 Rushing to get ready and head to work";
   } else if (hourIST >= 9 && hourIST < 12) {
-    return "🧠 Deep work mode";
+    return "🧠 In Meetings";
   } else if (hourIST >= 12 && hourIST < 13) {
-    return "🍱 Lunch & LinkedIn";
+    return "🍱 Grabbing something to eat";
   } else if (hourIST >= 13 && hourIST < 18) {
-    return "💻 On meetings, send memes responsibly";
+    return "💻 Still in meetings";
   } else if (hourIST >= 18 && hourIST < 21) {
-    return "🧪 Experimenting with GenAI ideas";
+    return "🧪 Out and about — reply might be slow";
   } else if (hourIST >= 21 && hourIST < 24) {
-    return "🎮 Gaming or winding down";
+    return "🎮 Free to chat!";
   } else {
-    return "🌙 Dreaming of better prompts";
+    return "🌙 Currently dreaming...";
   }
 }
