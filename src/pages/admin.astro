@@ -1,4 +1,5 @@
 ---
+// already using BasicLayout
 import BasicLayout from "../layouts/BasicLayout.astro";
 ---
 
@@ -6,6 +7,12 @@ import BasicLayout from "../layouts/BasicLayout.astro";
   <main class="text-white flex flex-col items-center justify-center w-full h-screen gap-4">
     <h1 class="text-3xl font-bold">🛠️ Admin Panel</h1>
     <p class="text-neutral-400">This is a placeholder for future AI-powered dashboard controls.</p>
-    <p class="text-sm text-neutral-600">More features coming soon...</p>
+
+    <a
+      href="/"
+      class="mt-4 inline-block px-4 py-2 border border-neutral-700 rounded-lg text-sm hover:bg-neutral-800 transition"
+    >
+      ← Back to Home
+    </a>
   </main>
 </BasicLayout>
