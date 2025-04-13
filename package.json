@@ -18,6 +18,7 @@
     "@astrojs/sitemap": "^3.3.0",
     "@astrojs/solid-js": "^5.0.5",
     "@astrojs/svelte": "^7.0.7",
+    "@google/generative-ai": "^0.5.0",
     "@iconify-json/ri": "^1.2.5",
     "@rive-app/canvas": "^2.26.5",
     "astro": "^5.5.4",
