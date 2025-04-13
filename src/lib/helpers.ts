@@ -41,7 +41,7 @@ export function getCurrentStatus(): string {
   );
 
   if (hourIST >= 8 && hourIST < 9) {
-    return "🚿 Rushing to get ready and head to work";
+    return "🚿 Rushing to get ready for work";
   } else if (hourIST >= 9 && hourIST < 13) {
     return "🧠 In Meetings";
   } else if (hourIST >= 13 && hourIST < 14) {
@@ -49,7 +49,7 @@ export function getCurrentStatus(): string {
   } else if (hourIST >= 14 && hourIST < 18) {
     return "💻 Still in meetings";
   } else if (hourIST >= 18 && hourIST < 21) {
-    return "🧪 Out and about — reply might be slow";
+    return "🧪 Out and about";
   } else if (hourIST >= 21 && hourIST < 24) {
     return "🎮 Free to chat!";
   } else {
