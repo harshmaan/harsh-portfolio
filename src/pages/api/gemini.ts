@@ -1,12 +1,12 @@
 // ✅ Astro API route syntax
 import type { APIRoute } from 'astro';
-import { GenerativeModel } from '@google/generative-ai';
-
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const { prompt } = await request.json();
+
+    const GEMINI_API_KEY = import.meta.env.GEMINI_API_KEY;
 
     if (!GEMINI_API_KEY) {
       console.error("❌ GEMINI_API_KEY is missing.");
@@ -15,10 +15,8 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const model = new GenerativeModel({
-      model: "gemini-2.0-flash",
-      apiKey: GEMINI_API_KEY,
-    });
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const result = await model.generateContent(prompt);
 
@@ -28,7 +26,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const text = await result.response.text(); // Note the await!
+    const text = await result.response.text(); // Await is correct here
     return new Response(JSON.stringify({ response: text }), {
       status: 200,
     });
