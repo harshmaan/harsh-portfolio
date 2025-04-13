@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Show bot reply
       const botEl = document.createElement("div");
       botEl.className = "chat-bubble bot";
-      botEl.innerHTML = `<p>🤖 ${botReply}</p>`;
+      botEl.innerHTML = `<p>🤖 Speaking… listen up! 🎧</p>`;
       messages.appendChild(botEl);
       messages.scrollTop = messages.scrollHeight;
 
