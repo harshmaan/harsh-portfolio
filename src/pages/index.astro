@@ -95,10 +95,17 @@ const posts = (await getCollection("blog"))?.sort(
       </div>
     </Card>
     <AwardsCard />
-    <Card colSpan="md:col-span-1" rowSpan="md:row-span-1">
-      <p class="text-xs">
-        © 2025 · Made by Harsh, inspired by Gianmarco.
-      </p>
+    <Card
+      colSpan="md:col-span-1"
+      rowSpan="md:row-span-1"
+      href="/admin"
+      colorText="text-neutral-900"
+      title="Made by Harsh"
+    >
+      <div class="flex items-center justify-between w-full text-xs">
+        <span>Inspired by Gianmarco</span>
+        <span class="text-sm">→</span>
+      </div>
     </Card>
   </main>
 </Layout>
