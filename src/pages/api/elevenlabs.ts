@@ -1,7 +1,7 @@
 export async function POST({ request }) {
   const { text } = await request.json();
 
-  const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/ErXwobaYiN019PkySvjV", {
+  const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/puAQxSeQK6FU8XqOJvhB", {
     method: "POST",
     headers: {
       "xi-api-key": import.meta.env.ELEVENLABS_API_KEY,
