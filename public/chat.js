@@ -32,9 +32,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const userMsg = input.value.trim();
     if (!userMsg) return;
 
-    const userEl = document.createElement("p");
-    userEl.innerText = "🧑 " + userMsg;
+    const userEl = document.createElement("div");
+    userEl.className = "chat-bubble user";
+    userEl.innerHTML = `<p>🧑 ${userMsg}</p>`;
     messages.appendChild(userEl);
+    
     input.value = '';
     messages.scrollTop = messages.scrollHeight;
 
@@ -63,9 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const data = await res.json();
-      const botEl = document.createElement("p");
-      botEl.innerText = "🤖 " + (data.response || "Hmm... no answer.");
+      const botEl = document.createElement("div");
+      botEl.className = "chat-bubble bot";
+      botEl.innerHTML = `<p>🤖 ${data.response || "Hmm... no answer."}</p>`;
       messages.appendChild(botEl);
+
       messages.scrollTop = messages.scrollHeight;
     } catch (err) {
       console.error("Chat error:", err);
