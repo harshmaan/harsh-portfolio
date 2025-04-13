@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
     input.value = '';
 
     try {
-      const fullPrompt = `
+      const fullPrompt = 
         You are a senior data scientist impersonating Harsh Maan — an expert in AI, machine learning, and data science, known for building intelligent systems and sharing thought leadership in the field.
 
         You should only respond to questions related to:
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
         Now, answer this user query as Harsh Maan:
         
         "${userMsg}"
-      `;
+      ;
 
       const res = await fetch("/api/gemini", {
         method: "POST",
@@ -74,20 +74,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const botReply = rawReply
         .replace(/[^\w\s.,!?'"-]/g, "")
         .replace(/\s+/g, " ")
-        .replace(/[*_~`>#]/g, "")
+        .replace(/[*_~>#]/g, "")
         .trim();
 
       // Show bot speaking placeholder
       const botEl = document.createElement("div");
       botEl.className = "chat-bubble bot";
-      botEl.innerHTML = `
+      botEl.innerHTML = 
       <p>🤖 Speaking… listen up! 🎧</p>
       <div class="voice-anim mt-2 flex gap-1">
         <div class="bar bar1"></div>
         <div class="bar bar2"></div>
         <div class="bar bar3"></div>
       </div>
-      `;
+      ;
       messages.appendChild(botEl);
       messages.scrollTop = messages.scrollHeight;
 
