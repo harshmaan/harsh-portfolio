@@ -80,7 +80,14 @@ document.addEventListener("DOMContentLoaded", () => {
       // Show bot speaking placeholder
       const botEl = document.createElement("div");
       botEl.className = "chat-bubble bot";
-      botEl.innerHTML = `<p>🤖 Speaking… listen up! 🎧</p>`;
+      botEl.innerHTML = `
+      <p>🤖 Speaking… listen up! 🎧</p>
+      <div class="voice-anim mt-2 flex gap-1">
+        <div class="bar bar1"></div>
+        <div class="bar bar2"></div>
+        <div class="bar bar3"></div>
+      </div>
+      `;
       messages.appendChild(botEl);
       messages.scrollTop = messages.scrollHeight;
 
@@ -98,6 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
       audio.onended = () => {
         input.disabled = false;
         submitBtn?.removeAttribute("disabled");
+        const anim = botEl.querySelector(".voice-anim");
+        if (anim) anim.remove();
       };
 
       await audio.play();
