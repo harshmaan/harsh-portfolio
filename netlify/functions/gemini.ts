@@ -7,6 +7,8 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const { prompt } = await request.json();
 
+    const inputPrompt = prompt?.trim() || "Give me 5 innovative project ideas using AI in healthcare.";
+
     if (!GEMINI_API_KEY) {
       console.error("❌ GEMINI_API_KEY is missing.");
       return new Response(JSON.stringify({ response: "API key not set." }), {
@@ -19,16 +21,17 @@ export const POST: APIRoute = async ({ request }) => {
       apiKey: GEMINI_API_KEY,
     });
 
-    const result = await model.generateContent(prompt);
+    const result = await model.generateContent(inputPrompt);
 
     if (!result || !result.response) {
-      console.error("❌ No response from model:", result);
-      return new Response(JSON.stringify({ response: "Empty response." }), {
+      console.error("❌ No response from Gemini model:", result);
+      return new Response(JSON.stringify({ response: "Empty response from Gemini." }), {
         status: 500,
       });
     }
 
     const text = result.response.text();
+
     return new Response(JSON.stringify({ response: text }), {
       status: 200,
     });
