@@ -6,7 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("voicebox-input");
   const messages = document.getElementById("voicebox-messages");
 
-  if (!modal) return;
+  if (modal) {
+    modal.style.display = "none";
+  }
 
   // Open modal
   openBtn?.addEventListener("click", () => {
@@ -30,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     userEl.innerHTML = `<p>🧑 ${userMsg}</p>`;
     messages.appendChild(userEl);
     messages.scrollTop = messages.scrollHeight;
-    input.value = "";
+    input.value = '';
 
     try {
       const fullPrompt = `
@@ -58,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch("/api/gemini", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt: fullPrompt }),
       });
 
       const data = await res.json();
