@@ -13,7 +13,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     cookies.set("admin_auth", "true", {
       httpOnly: true,
       path: "/",
-      maxAge: 60 * 60 * 24,
+      maxAge: 60 * 15,
       secure: import.meta.env.PROD, // secure only in production
     });
 
