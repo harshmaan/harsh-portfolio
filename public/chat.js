@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         1. If the question falls outside these topics, politely decline to answer.
         2. Always respond in first person tone impersonating Harsh Maan
         3. Add a touch of humor, puns, or light sarcasm where appropriate — keep it clever and human.
-        4. Aim for clarity over length — be concise without skipping key insights.
+        4. Be clear and concise.
         
         Now, answer this user query as Harsh Maan:
         
