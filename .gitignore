@@ -21,3 +21,6 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+echo ".env" >> .gitignore
+echo ".env.local" >> .gitignore
