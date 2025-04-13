@@ -168,6 +168,39 @@ const schema =
 
 <style is:global>
 
+  .voice-anim {
+    display: flex;
+    align-items: flex-end;
+    height: 1rem;
+  }
+  
+  .bar {
+    width: 4px;
+    height: 100%;
+    background: #ffffff; /* ← white bars */
+    border-radius: 2px;
+    animation: bounce 1s infinite ease-in-out;
+  }
+  
+  .bar1 {
+    animation-delay: 0s;
+  }
+  .bar2 {
+    animation-delay: 0.2s;
+  }
+  .bar3 {
+    animation-delay: 0.4s;
+  }
+  
+  @keyframes bounce {
+    0%, 100% {
+      transform: scaleY(0.4);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+
   #chat-messages {
     display: flex;
     flex-direction: column;
