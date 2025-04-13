@@ -6,18 +6,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("voicebox-input");
   const messages = document.getElementById("voicebox-messages");
 
-  // Always hide the modal if it exists
-  if (modal) modal.style.display = "none";
-
-  // Stop if required elements are missing (i.e., not the homepage)
-  if (!openBtn || !modal || !closeBtn || !form || !input || !messages) return;
+  // ✅ Force hide on initial load
+  if (modal) {
+    chatModal.style.display = "none";
+  }
 
   openBtn.addEventListener("click", () => {
-    modal.style.display = "flex";
+      if (modal) {
+        modal.style.display = "flex";
+        }
   });
 
   closeBtn.addEventListener("click", () => {
-    modal.style.display = "none";
+      if (modal) {
+        modal.style.display = "none";
+        }
   });
 
   form.addEventListener("submit", async (e) => {
