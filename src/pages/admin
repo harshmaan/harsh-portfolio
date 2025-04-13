@@ -1,0 +1,11 @@
+---
+import BasicLayout from "../layouts/BasicLayout.astro";
+---
+
+<BasicLayout title="Admin Panel" description="Welcome to your AI admin panel.">
+  <main class="text-white flex flex-col items-center justify-center w-full h-screen gap-4">
+    <h1 class="text-3xl font-bold">🛠️ Admin Panel</h1>
+    <p class="text-neutral-400">This is a placeholder for future AI-powered dashboard controls.</p>
+    <p class="text-sm text-neutral-600">More features coming soon...</p>
+  </main>
+</BasicLayout>
