@@ -5,35 +5,57 @@ const showError = url.searchParams.get("error") === "1";
 ---
 
 <BasicLayout title="Login" description="Secure login to access admin features.">
-  <main class="text-white flex flex-col items-center justify-center w-full h-screen gap-4">
-    <h1 class="text-2xl font-bold">🔐 Admin Login</h1>
+  <style is:global>
+    @keyframes pulse-once {
+      0% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.4); }
+      100% { box-shadow: none; }
+    }
+    .animate-pulse-once {
+      animation: pulse-once 1.2s ease-in-out;
+    }
+  </style>
+
+  <main class="relative text-white flex flex-col items-center justify-center w-full h-screen gap-4 bg-gradient-to-b from-neutral-950 to-black">
+    <h1 class="text-3xl font-extrabold tracking-wide uppercase text-red-500 drop-shadow">
+      🛡️ Restricted Access Only
+    </h1>
 
     {showError && (
       <p class="text-red-500 text-sm">Access Denied.</p>
     )}
 
-    <form method="POST" action="/api/login" class="flex flex-col gap-4 w-full max-w-sm">
+    <form method="POST" action="/api/login" class="flex flex-col gap-4 w-full max-w-sm border border-red-600 bg-neutral-900 bg-opacity-80 rounded-xl p-6 shadow-lg backdrop-blur-md animate-pulse-once">
       <input
         type="text"
         name="id"
         placeholder="Enter ID"
-        class="bg-neutral-900 text-white px-4 py-2 rounded border border-neutral-700 focus:outline-none focus:ring"
+        class="bg-black bg-opacity-60 text-white px-4 py-2 rounded border border-neutral-700 focus:outline-none focus:ring"
         required
       />
       <input
         type="password"
         name="password"
         placeholder="Enter Password"
-        class="bg-neutral-900 text-white px-4 py-2 rounded border border-neutral-700 focus:outline-none focus:ring"
+        class="bg-black bg-opacity-60 text-white px-4 py-2 rounded border border-neutral-700 focus:outline-none focus:ring"
         required
       />
       <button
         type="submit"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold"
+        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-semibold shadow-md hover:shadow-red-500/50 transition"
       >
-        Login
+        Enter
       </button>
     </form>
-    <a href="/" class="text-sm text-neutral-400 hover:text-white mt-2">← Back to Home</a>
+
+    <form method="POST" action="/api/logout">
+      <button
+        type="submit"
+        class="text-sm text-neutral-400 hover:text-white mt-2 underline"
+      >
+        ← Logout
+      </button>
+    </form>
+
+    <a href="/" class="text-sm text-neutral-400 hover:text-white">← Back to Home</a>
   </main>
 </BasicLayout>
