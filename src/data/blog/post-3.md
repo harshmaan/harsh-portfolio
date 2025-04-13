@@ -10,6 +10,6 @@ It’s Monday morning and you need a detailed data report, a polished PDF summar
 
 Well, I recently did that by using MCP servers (Managed/Model Context Protocol servers) with an AI assistant. In an experimentation, I connected 3 MCP servers via a chat interface (Claude AI) and achieved the whole workflow with just a few natural language prompts.
 
-- [The Magic of MCP Servers: When AI Becomes Your Workflow Wiz ]([https://astro.build](https://www.linkedin.com/pulse/magic-mcp-servers-when-ai-becomes-your-workflow-wiz-harsh-maan-ql5vc))
+- [The Magic of MCP Servers: When AI Becomes Your Workflow Wiz ](https://www.linkedin.com/pulse/magic-mcp-servers-when-ai-becomes-your-workflow-wiz-harsh-maan-ql5vc)
 
 If this glimpse has you wondering what MCP‑powered automation could do for your own workflows, hop over to the full article at the link above for the complete breakdown and key takeaways.
