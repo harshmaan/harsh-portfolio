@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  import { marked } from "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
   const form = document.getElementById("chat-form");
   const input = document.getElementById("chat-input");
   const messages = document.getElementById("chat-messages");
@@ -73,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       const botEl = document.createElement("div");
       botEl.className = "chat-bubble bot";
-      botEl.innerHTML = `<p>🤖</p><div class="markdown">${marked.parse(data.response || "Hmm... no answer.")}</div>`;
+      botEl.innerHTML = `<p>🤖 ${data.response || "Hmm... no answer."}</p>`;
       messages.appendChild(botEl);
 
       messages.scrollTop = messages.scrollHeight;
