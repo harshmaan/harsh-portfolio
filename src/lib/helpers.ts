@@ -33,3 +33,26 @@ export function formatDate(date: Date): string {
     timeZone: "Asia/Kolkata",
   });
 }
+
+export function getCurrentStatus(): string {
+  const now = new Date();
+  const hourIST = parseInt(
+    now.toLocaleString("en-US", { hour: "numeric", hour12: false, timeZone: "Asia/Kolkata" })
+  );
+
+  if (hourIST >= 6 && hourIST < 9) {
+    return "🏃 Getting those gains! (At the gym)";
+  } else if (hourIST >= 9 && hourIST < 12) {
+    return "🧠 Deep work mode";
+  } else if (hourIST >= 12 && hourIST < 13) {
+    return "🍱 Lunch & LinkedIn";
+  } else if (hourIST >= 13 && hourIST < 18) {
+    return "💻 On meetings, send memes responsibly";
+  } else if (hourIST >= 18 && hourIST < 21) {
+    return "🧪 Experimenting with GenAI ideas";
+  } else if (hourIST >= 21 && hourIST < 24) {
+    return "🎮 Gaming or winding down";
+  } else {
+    return "🌙 Dreaming of better prompts";
+  }
+}
