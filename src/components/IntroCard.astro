@@ -1,66 +1,19 @@
 ---
-import Card from "./Card/index.astro";
-import Button from "./Button.astro";
-import { LINKS } from "../lib/constants";
-import { Icon } from 'astro-icon/components'
-import Tooltip from "./Tooltip/index";
-import { Image } from "astro:assets";
+import Layout from "../../layouts/Layout.astro";
 ---
 
-<Card colSpan="md:col-span-3" rowSpan="md:row-span-4">
-  <div class="flex w-full h-full">
-    <div class="flex flex-col justify-between md:max-h-[300px] gap-4">
-      <div class="flex flex-col h-full">
-        <h6 class="text-sm font-light m-0 text-gray-500">welcome</h6>
-        <p class="m-0 font-light text-xl">
-          I'm <b class="font-bold">Harsh Maan</b>, a Data
-          Scientist with a strong focus on AI‑driven solutions and cutting‑edge machine‑learning models. 
-          I’ve spent the past four years building AI, ML Products and Data Pipelines at Accenture Research and Amdocs,
-          and today my sweet spot is rapid prototyping with large‑language‑model 
-          techniques—think RAG, agent frameworks and multimodal AI.
-        </p>
-      </div>
+<Layout title="Synapse – An AI Magazine" description="Explore editions of Synapse by Harsh Maan.">
+  <main class="p-8 text-white max-w-5xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">🧠 Synapse: An AI Magazine</h1>
+    <p class="text-lg mb-8 text-gray-300">
+      Curated editions of AI insights, GenAI experiments, and trends.
+    </p>
 
-      <!-- Icon buttons row -->
-      <div class="flex gap-4">
-        <a aria-label="linkedin profile" href={LINKS.linkedin} target="_blank">
-          <Button aria-label="linkedin profile">
-            <Icon class="h-6" name="ri:linkedin-box-fill" />
-            <span class="sr-only">Linkedin Profile</span>
-          </Button>
-        </a>
-        <a aria-label="dribble profile" href={LINKS.dribble} target="_blank">
-          <Button aria-label="dribble profile">
-            <Icon class="h-6" name="ri:dribbble-fill" />
-            <span class="sr-only">Dribble Profile</span>
-          </Button>
-        </a>
-        <Tooltip client:visible>
-          <Button aria-label="easter egg btn">
-            <Icon class="h-6" name="ri:emotion-laugh-line" />
-            <span class="sr-only">Easter egg button</span>
-          </Button>
-        </Tooltip>
-      </div>
-
-      <!-- Synapse button below the icons -->
-      <div>
-        <a href="/synapse" aria-label="Synapse AI Magazine">
-          <Button
-            class="mt-2 w-[160px] sm:w-[180px] border-2 border-red-500 border-b-[3px] text-white bg-transparent hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg transition text-sm font-medium text-center whitespace-normal"
-          >
-            Synapse: An AI Magazine
-          </Button>
-        </a>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="border border-red-500 border-b-[3px] rounded-lg p-4 hover:bg-red-600 transition duration-300">
+        <h2 class="text-xl font-semibold">🗓️ Test Tile</h2>
+        <p class="text-sm text-gray-400 mt-1">This should be visible</p>
       </div>
     </div>
-
-    <Image
-      alt="memoji of gianmarco"
-      class="w-auto max-h-[300px] select-none absolute right-[-110px] bottom-[-20px] z-[-1] opacity-50 md:opacity-100 md:relative md:right-auto md:bottom-auto md:z-auto pointer-events-none"
-      height="300"
-      src="/me.webp"
-      width="300"
-    />
-  </div>
-</Card>
+  </main>
+</Layout>
