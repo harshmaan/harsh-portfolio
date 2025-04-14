@@ -38,14 +38,13 @@ import { Image } from "astro:assets";
             <Icon class="h-6" name="ri:emotion-laugh-line" />
             <span class="sr-only">Easter egg button</span>
           </Button>
-        </Tooltip>
-        <Tooltip message="Synapse: An AI Magazine" client:visible>
-          <a href="/synapse" aria-label="Synapse AI Magazine">
-            <Button class="w-10 h-10 border-2 border-red-500 border-b-[3px] bg-transparent hover:bg-red-600 text-white rounded-lg flex items-center justify-center">
-              <Icon name="ri:book-2-line" class="h-5 w-5" />
-            </Button>
-          </a>
-        </Tooltip>
+        <a href="/synapse" aria-label="Synapse AI Magazine">
+           <Button
+             class="border-2 border-red-500 border-b-[3px] text-white bg-transparent hover:bg-red-600 hover:text-white px-3 py-2 rounded-lg transition text-xs font-medium text-center leading-tight whitespace-normal w-[120px] sm:w-auto"
+           >
+             Synapse: An AI Magazine
+           </Button>
+         </a>
       </div>
     </div>
     <Image
