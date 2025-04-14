@@ -1,0 +1,37 @@
+---
+import Card from "./Card/index.astro";
+import Pulse from "./Pulse.astro";
+import { getCurrentStatus } from "../lib/helpers";
+
+const status = getCurrentStatus();
+
+// Calculate percentage of day complete (for bar width)
+const now = new Date();
+const totalMinutes = now.getHours() * 60 + now.getMinutes();
+const percentOfDay = Math.floor((totalMinutes / 1440) * 100);
+---
+
+<Card colSpan="md:col-span-1" rowSpan="md:row-span-1">
+  <div class="h-full flex flex-col justify-start relative">
+    <!-- Title + status on left, Pulse on right -->
+    <div class="flex justify-between items-start mb-2">
+      <div class="flex flex-col">
+        <h2 class="text-lg font-semibold text-white">Live Feed</h2>
+        <p class="text-sm text-white">{status}</p>
+      </div>
+      <div class="pt-1">
+        <Pulse />
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="h-2 bg-white/20 rounded-full overflow-hidden relative">
+      <div
+        class="h-full bg-white/30 rounded-full transition-all duration-700 relative"
+        style={`width: ${percentOfDay}%`}
+      >
+        <div class="absolute inset-0 shimmer-glow rounded-full"></div>
+      </div>
+    </div>
+  </div>
+</Card>
