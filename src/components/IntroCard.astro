@@ -20,6 +20,8 @@ import { Image } from "astro:assets";
           techniques—think RAG, agent frameworks and multimodal AI.
         </p>
       </div>
+
+      <!-- Icon buttons row -->
       <div class="flex gap-4">
         <a aria-label="linkedin profile" href={LINKS.linkedin} target="_blank">
           <Button aria-label="linkedin profile">
@@ -38,17 +40,27 @@ import { Image } from "astro:assets";
             <Icon class="h-6" name="ri:emotion-laugh-line" />
             <span class="sr-only">Easter egg button</span>
           </Button>
+        </Tooltip>
+      </div>
+
+      <!-- Synapse button below the icons -->
+      <div>
         <a href="/synapse" aria-label="Synapse AI Magazine">
-           <Button
-             class="border-2 border-red-500 border-b-[3px] text-white bg-transparent hover:bg-red-600 hover:text-white px-3 py-2 rounded-lg transition text-xs font-medium text-center leading-tight whitespace-normal w-[120px] sm:w-auto"
-           >
-             Synapse: An AI Magazine
-           </Button>
-         </a>
+          <Button
+            class="mt-2 w-[160px] sm:w-[180px] border-2 border-red-500 border-b-[3px] text-white bg-transparent hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg transition text-sm font-medium text-center whitespace-normal"
+          >
+            Synapse: An AI Magazine
+          </Button>
+        </a>
       </div>
     </div>
+
     <Image
-      alt="memoji of gianmarco"       class="w-auto max-h-[300px] select-none absolute right-[-110px] bottom-[-20px] z-[-1] opacity-50 md:opacity-100 md:relative md:right-auto md:bottom-auto md:z-auto pointer-events-none"       height="300"       src="/me.webp"       width="300"
+      alt="memoji of gianmarco"
+      class="w-auto max-h-[300px] select-none absolute right-[-110px] bottom-[-20px] z-[-1] opacity-50 md:opacity-100 md:relative md:right-auto md:bottom-auto md:z-auto pointer-events-none"
+      height="300"
+      src="/me.webp"
+      width="300"
     />
   </div>
 </Card>
