@@ -150,7 +150,7 @@ const JoinPage = () => {
       </a>
       <Show when={!joined()}>
         <div class="max-w-md mx-auto space-y-4">
-          <h1 class="text-2xl font-bold">🎮 Join Prompt Quest</h1>
+          <h1 class="text-2xl font-bold">Enter the Arena</h1>
           <input class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white" placeholder="Enter your name" value={name()} onInput={(e) => setName(e.currentTarget.value)} />
           <input class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white" placeholder="Enter session ID" value={sessionId()} onInput={(e) => setSessionId(e.currentTarget.value)} />
           <button class="w-full bg-red-600 hover:bg-red-700 py-2 rounded" onClick={handleJoin}>🚀 Join Game</button>
