@@ -34,7 +34,7 @@
     "solid-js": "^1.9.5",
     "svelte": "^5.25.3",
     "solid-js": "^1.9.5",
-    "@solidjs/router": "^0.39.1"
+    "@solidjs/router": "^0.15.3"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",
