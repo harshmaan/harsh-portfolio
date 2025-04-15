@@ -46,14 +46,22 @@ const JoinPage = () => {
 
     const promptRef = ref(db, `sessions/${sessionId()}/prompt`);
     onValue(promptRef, (snapshot) => {
-      setPrompt(snapshot.val() || "");
+      const val = snapshot.val() || "";
+      setPrompt(val);
+    
+      // 🧼 Reset states for all players when host clears prompt
+      if (!val) {
+        setHasSubmitted(false);
+        setResponse("");
+        setScores({});
+      }
     });
 
     const scoresRef = ref(db, `sessions/${sessionId()}/scores`);
     onValue(scoresRef, (snapshot) => {
       const data = snapshot.val() || {};
       setScores(data);
-      setRoundComplete(Object.keys(data).length > 0);
+      setRoundComplete(!!snapshot.exists());
     });
 
     const winnerRef = ref(db, `sessions/${sessionId()}/winnerId`);
