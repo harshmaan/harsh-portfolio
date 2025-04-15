@@ -1,56 +1,56 @@
 ---
+import { useState } from "solid-js";
+import { useNavigate } from "@solidjs/router";
+import { ref, push, set } from "firebase/database";
+import { db } from "../../lib/firebase";
 ---
-<html>
-  <head>
-    <title>Join Prompt Quest</title>
-  </head>
-  <body class="bg-black text-white p-6">
-    <div class="max-w-md mx-auto space-y-4">
-      <h1 class="text-2xl font-bold">Join Prompt Quest</h1>
-      <form id="join-form" class="space-y-4">
-        <div>
-          <label for="name" class="block mb-1">Your Name:</label>
-          <input
-            id="name"
-            name="name"
-            required
-            class="w-full px-3 py-2 rounded bg-neutral-800 border border-neutral-600"
-          />
-        </div>
 
-        <div>
-          <label for="sessionId" class="block mb-1">Session ID:</label>
-          <input
-            id="sessionId"
-            name="sessionId"
-            required
-            class="w-full px-3 py-2 rounded bg-neutral-800 border border-neutral-600"
-          />
-        </div>
+<script type="module">
+  import { createSignal } from "solid-js";
+  import { useNavigate } from "@solidjs/router";
+  import { db } from "../../lib/firebase";
+  import { ref, push, set } from "firebase/database";
 
-        <button
-          type="submit"
-          class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded font-medium"
-        >
-          🚀 Join Game
-        </button>
-      </form>
-    </div>
+  const [name, setName] = createSignal("");
+  const [sessionId, setSessionId] = createSignal("");
+  const navigate = useNavigate();
 
-    <script type="module">
-      document.getElementById("join-form").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const name = document.getElementById("name").value;
-        const sessionId = document.getElementById("sessionId").value;
-      
-        // Save to localStorage first
-        localStorage.setItem("promptQuestName", name);
-      
-        // Use a short delay to ensure it's persisted
-        setTimeout(() => {
-          window.location.href = `/prompt-quest/game/${sessionId}`;
-        }, 100); // 100ms is enough
-      });
-    </script>
-  </body>
-</html>
+  const handleJoin = async () => {
+    if (!name().trim() || !sessionId().trim()) return;
+
+    const playerRef = push(ref(db, `sessions/${sessionId()}/players`));
+    await set(playerRef, {
+      name: name(),
+      responded: false,
+      readyNextRound: false,
+    });
+
+    const playerId = playerRef.key;
+    // Navigate with playerId in URL
+    navigate(`/prompt-quest/game/${sessionId()}?playerId=${playerId}`);
+  };
+</script>
+
+<div class="min-h-screen bg-[#0d0d0d] text-white flex items-center justify-center">
+  <div class="bg-neutral-900 p-6 rounded-lg shadow-lg w-full max-w-md space-y-4">
+    <h1 class="text-xl font-bold mb-4">🎮 Join Prompt Quest</h1>
+    <input
+      class="w-full p-2 border border-neutral-600 rounded bg-neutral-800 text-white"
+      placeholder="Enter your name"
+      value={name()}
+      onInput={(e) => setName(e.currentTarget.value)}
+    />
+    <input
+      class="w-full p-2 border border-neutral-600 rounded bg-neutral-800 text-white"
+      placeholder="Enter session ID"
+      value={sessionId()}
+      onInput={(e) => setSessionId(e.currentTarget.value)}
+    />
+    <button
+      class="w-full bg-red-600 hover:bg-red-700 py-2 rounded-lg"
+      onClick={handleJoin}
+    >
+      🚀 Join Game
+    </button>
+  </div>
+</div>
