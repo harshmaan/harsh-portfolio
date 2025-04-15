@@ -1,14 +1,11 @@
-// File: src/components/JoinGame.tsx
+// File: src/components/JoinPage.tsx
 import { createSignal, onMount, For } from "solid-js";
 import { ref, set, onValue, update } from "firebase/database";
-import { db } from "../lib/firebase"; // make sure this path is correct
+import { db } from "../lib/firebase";
 
-interface Props {
-  sessionId: string;
-}
-
-const JoinGame = (props: Props) => {
-  const sessionId = props.sessionId;
+const JoinPage = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sessionId = urlParams.get("sessionId") || "";
   const playerName = localStorage.getItem("promptQuestName") || "";
   const playerId = crypto.randomUUID();
 
@@ -52,7 +49,7 @@ const JoinGame = (props: Props) => {
     setHasSubmitted(true);
   };
 
-  if (!playerName) {
+  if (!playerName || !sessionId) {
     return (
       <div class="min-h-screen bg-[#0d0d0d] text-white flex items-center justify-center">
         <p>⚠️ Please go back and enter your name to join the game.</p>
@@ -100,4 +97,4 @@ const JoinGame = (props: Props) => {
   );
 };
 
-export default JoinGame;
+export default JoinPage;
