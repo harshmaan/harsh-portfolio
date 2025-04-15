@@ -2,7 +2,7 @@
 import { onMount } from "solid-js";
 import { createSignal } from "solid-js";
 import { useParams } from "@solidjs/router";
-import { db } from "../../../lib/firebase";
+import { db } from "../lib/firebase";
 import { ref, set, onValue, update } from "firebase/database";
 
 const GameRoom = () => {
