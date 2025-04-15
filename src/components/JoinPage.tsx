@@ -30,7 +30,7 @@ const JoinPage = () => {
       name: name(),
       responded: false,
       readyNextRound: false,
-      joinedAt: Date.now(), // 👈 Add this line to record when player joined
+      joinedAt: Date.now(),
     });
 
     setJoined(true);
@@ -41,7 +41,7 @@ const JoinPage = () => {
       const sortedEntries = Object.entries(data).sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0));
       const formatted = sortedEntries.map(([id, val]: any) => ({ id, ...val }));
       setPlayers(formatted);
-      setHostId(formatted[0]?.id || null); // ✅ Host is the first one who joined
+      setHostId(formatted[0]?.id || null);
     });
 
     const promptRef = ref(db, `sessions/${sessionId()}/prompt`);
@@ -53,13 +53,12 @@ const JoinPage = () => {
     onValue(scoresRef, (snapshot) => {
       const data = snapshot.val() || {};
       setScores(data);
-      if (Object.keys(data).length > 0) setRoundComplete(true);
+      setRoundComplete(Object.keys(data).length > 0);
     });
 
     const winnerRef = ref(db, `sessions/${sessionId()}/winnerId`);
     onValue(winnerRef, (snapshot) => {
-      const data = snapshot.val() || "";
-      setWinnerId(data);
+      setWinnerId(snapshot.val() || "");
     });
 
     const responsesRef = ref(db, `sessions/${sessionId()}/responses`);
@@ -103,7 +102,6 @@ const JoinPage = () => {
   const handleSubmit = async () => {
     const responseVal = response();
     const playerPath = `sessions/${sessionId()}/players/${playerId()}`;
-
     await set(ref(db, `sessions/${sessionId()}/responses/${playerId()}`), responseVal);
     await update(ref(db, playerPath), { responded: true });
     setHasSubmitted(true);
@@ -113,12 +111,14 @@ const JoinPage = () => {
     await remove(ref(db, `sessions/${sessionId()}/responses`));
     await remove(ref(db, `sessions/${sessionId()}/scores`));
     await remove(ref(db, `sessions/${sessionId()}/winnerId`));
+
     const updates: any = {};
     players().forEach((p) => {
       updates[p.id] = { ...p, responded: false };
     });
     await update(ref(db, `sessions/${sessionId()}/players`), updates);
     await set(ref(db, `sessions/${sessionId()}/prompt`), "");
+
     setPrompt("");
     setResponse("");
     setScores({});
@@ -138,16 +138,16 @@ const JoinPage = () => {
     const data = await res.json();
     await set(ref(db, `sessions/${sessionId()}/prompt`), data.response);
   };
-  
+
   return (
     <main class="p-6 w-full max-w-screen-xl mx-auto text-white overflow-x-hidden overflow-y-auto min-h-screen">
-      {/* ← Back button - shows on all pages */}
       <a
         class="text-white absolute bg-neutral-900 hover:bg-neutral-800 top-4 left-4 px-4 py-2 border border-neutral-600 rounded-lg text-sm z-50"
         href="/"
       >
         ← Back
       </a>
+
       <Show when={!joined()}>
         <div class="max-w-md mx-auto space-y-4">
           <h1 class="text-2xl font-bold">Enter the Arena</h1>
@@ -172,7 +172,7 @@ const JoinPage = () => {
                 </div>
               )}
             </For>
-            <Show when={roundComplete()}>
+            <Show when={roundComplete() && isHost()}>
               <div class="mt-4 border-t border-neutral-700 pt-2 text-xs">
                 <h3 class="text-sm font-semibold">🏅 Scores</h3>
                 <For each={Object.entries(scores())}>
@@ -181,9 +181,7 @@ const JoinPage = () => {
                     return <div>{p?.name || pid}: {score}</div>;
                   }}
                 </For>
-                <Show when={isHost()}>
-                  <button class="mt-3 text-sm bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded" onClick={startNewRound}>🔄 New Round</button>
-                </Show>
+                <button class="mt-3 text-sm bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded" onClick={startNewRound}>🔄 New Round</button>
               </div>
             </Show>
           </aside>
@@ -219,7 +217,6 @@ const JoinPage = () => {
 
             <Show when={roundComplete()}>
               <div class="bg-neutral-800 border border-neutral-600 p-4 rounded-lg">
-                <h2 class="text-xl font-semibold mb-2">🏆 Round Complete!</h2>
                 <p class="mb-2">🎉 <strong>{players().find(p => p.id === winnerId())?.name}</strong> won this round!</p>
                 <Show when={winnerId()}>
                   <div class="mt-2 text-sm text-gray-300">
