@@ -130,7 +130,10 @@ const JoinPage = () => {
     const res = await fetch("/api/gemini", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: "Generate a creative multiplayer writing game prompt in markdown format. Keep it quirky and challenging." }),
+      body: JSON.stringify({
+        prompt:
+          "You are a fun-loving game master designing silly and creative convincing-type challenges for a multiplayer storytelling game called Prompt Quest.\n\nEach challenge should ask the player to convince a strange character or creature to do something — but the twist is, they must use a weird or funny way of speaking.\n\nFormat:\n\"Convince <being> to <do something> — but you can only <funny constraint>.\"\n\nMake the characters unusual (like aliens, ghosts, pirates, robots), and keep the constraints fun and easy to understand.\n\nExamples:\n\n“Convince a dragon to give you the treasure — but you can only use cooking metaphors.”\n“Convince a ghost to stop haunting your house — but you can only talk in dad jokes.”\n“Convince a robot to let you into the control room — but you can only speak like a pirate.”\n“Convince an alien to share their technology — but you can only talk like a game show host.”",
+      }),
     });
     const data = await res.json();
     await set(ref(db, `sessions/${sessionId()}/prompt`), data.response);
