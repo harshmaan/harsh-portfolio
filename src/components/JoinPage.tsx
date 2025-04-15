@@ -181,7 +181,9 @@ const JoinPage = () => {
                     return <div>{p?.name || pid}: {score}</div>;
                   }}
                 </For>
-                <button class="mt-3 text-sm bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded" onClick={startNewRound}>🔄 New Round</button>
+                <Show when={isHost()}>
+                  <button class="mt-3 text-sm bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded" onClick={startNewRound}>🔄 New Round</button>
+                </Show>
               </div>
             </Show>
           </aside>
