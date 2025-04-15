@@ -42,9 +42,14 @@
         e.preventDefault();
         const name = document.getElementById("name").value;
         const sessionId = document.getElementById("sessionId").value;
-
+      
+        // Save to localStorage first
         localStorage.setItem("promptQuestName", name);
-        window.location.href = `/prompt-quest/game/${sessionId}`;
+      
+        // Use a short delay to ensure it's persisted
+        setTimeout(() => {
+          window.location.href = `/prompt-quest/game/${sessionId}`;
+        }, 100); // 100ms is enough
       });
     </script>
   </body>
