@@ -1,7 +1,0 @@
----
-import JoinGame from "../../../components/JoinPage"; // assuming renamed to JoinGame.tsx
-const { sessionId } = Astro.params;
-const playerId = new URL(Astro.request.url).searchParams.get("playerId");
----
-
-<JoinGame client:only="solid" sessionId={sessionId} playerId={playerId} />
