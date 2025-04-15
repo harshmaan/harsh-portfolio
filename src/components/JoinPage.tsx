@@ -133,7 +133,7 @@ const JoinPage = () => {
   };
 
   return (
-    <main class="min-h-screen bg-[#0d0d0d] text-white p-6">
+    <main class="p-6 w-full max-w-screen-lg">
       <Show when={!joined()}>
         <div class="max-w-md mx-auto space-y-4">
           <h1 class="text-2xl font-bold">🎮 Join Prompt Quest</h1>
