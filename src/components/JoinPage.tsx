@@ -45,12 +45,25 @@ const JoinPage = () => {
       setPrompt(snapshot.val() || "");
     });
 
+    const scoresRef = ref(db, `sessions/${sessionId()}/scores`);
+    onValue(scoresRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      setScores(data);
+      if (Object.keys(data).length > 0) setRoundComplete(true);
+    });
+
+    const winnerRef = ref(db, `sessions/${sessionId()}/winnerId`);
+    onValue(winnerRef, (snapshot) => {
+      const data = snapshot.val() || "";
+      setWinnerId(data);
+    });
+
     const responsesRef = ref(db, `sessions/${sessionId()}/responses`);
     onValue(responsesRef, async (snapshot) => {
       const data = snapshot.val() || {};
       const allResponded = players().length > 0 && Object.keys(data).length === players().length;
 
-      if (allResponded && !roundComplete()) {
+      if (allResponded && isHost()) {
         const promptText = prompt();
         const newScores: Record<string, number> = {};
 
@@ -59,10 +72,9 @@ const JoinPage = () => {
           newScores[pid] = score;
         }
 
-        setScores(newScores);
         const sorted = Object.entries(newScores).sort((a, b) => b[1] - a[1]);
-        setWinnerId(sorted[0][0]);
-        setRoundComplete(true);
+        await set(ref(db, `sessions/${sessionId()}/scores`), newScores);
+        await set(ref(db, `sessions/${sessionId()}/winnerId`), sorted[0][0]);
       }
     });
   };
@@ -95,6 +107,8 @@ const JoinPage = () => {
 
   const startNewRound = async () => {
     await remove(ref(db, `sessions/${sessionId()}/responses`));
+    await remove(ref(db, `sessions/${sessionId()}/scores`));
+    await remove(ref(db, `sessions/${sessionId()}/winnerId`));
     const updates: any = {};
     players().forEach((p) => {
       updates[p.id] = { ...p, responded: false };
