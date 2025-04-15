@@ -1,13 +1,14 @@
-// File: src/pages/prompt-quest/game/[sessionId].tsx
-import { onMount } from "solid-js";
-import { createSignal } from "solid-js";
-import { useParams } from "@solidjs/router";
-import { db } from "../lib/firebase";
+// File: src/components/JoinGame.tsx
+import { createSignal, onMount, For } from "solid-js";
 import { ref, set, onValue, update } from "firebase/database";
+import { db } from "../lib/firebase"; // make sure this path is correct
 
-const GameRoom = () => {
-  const params = useParams();
-  const sessionId = params.sessionId;
+interface Props {
+  sessionId: string;
+}
+
+const JoinGame = (props: Props) => {
+  const sessionId = props.sessionId;
   const playerName = localStorage.getItem("promptQuestName") || "";
   const playerId = crypto.randomUUID();
 
@@ -29,7 +30,10 @@ const GameRoom = () => {
     const playersRef = ref(db, `sessions/${sessionId}/players`);
     onValue(playersRef, (snapshot) => {
       const data = snapshot.val() || {};
-      const formatted = Object.entries(data).map(([id, val]: any) => ({ id, ...val }));
+      const formatted = Object.entries(data).map(([id, val]: any) => ({
+        id,
+        ...val,
+      }));
       setPlayers(formatted);
     });
 
@@ -47,6 +51,14 @@ const GameRoom = () => {
     await update(playerRef, { responded: true });
     setHasSubmitted(true);
   };
+
+  if (!playerName) {
+    return (
+      <div class="min-h-screen bg-[#0d0d0d] text-white flex items-center justify-center">
+        <p>⚠️ Please go back and enter your name to join the game.</p>
+      </div>
+    );
+  }
 
   return (
     <main class="min-h-screen bg-[#0d0d0d] text-white p-6 flex flex-col md:flex-row gap-6">
@@ -66,9 +78,7 @@ const GameRoom = () => {
 
       <section class="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-6">
         <h1 class="text-2xl font-bold mb-4">🎯 Quest Prompt</h1>
-        <p class="text-gray-300 mb-6">
-          {prompt() || "Waiting for prompt to load..."}
-        </p>
+        <p class="text-gray-300 mb-6">{prompt() || "Waiting for prompt to load..."}</p>
 
         <textarea
           class="w-full bg-neutral-800 border border-neutral-600 text-white rounded-lg p-3 min-h-[120px]"
@@ -90,4 +100,4 @@ const GameRoom = () => {
   );
 };
 
-export default GameRoom;
+export default JoinGame;
