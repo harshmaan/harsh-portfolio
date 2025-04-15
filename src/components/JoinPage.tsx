@@ -30,6 +30,7 @@ const JoinPage = () => {
       name: name(),
       responded: false,
       readyNextRound: false,
+      joinedAt: Date.now(), // 👈 Add this line to record when player joined
     });
 
     setJoined(true);
@@ -37,10 +38,10 @@ const JoinPage = () => {
     const playersRef = ref(db, `sessions/${sessionId()}/players`);
     onValue(playersRef, (snapshot) => {
       const data = snapshot.val() || {};
-      const formatted = Object.entries(data).map(([id, val]: any) => ({ id, ...val }));
+      const sortedEntries = Object.entries(data).sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0));
+      const formatted = sortedEntries.map(([id, val]: any) => ({ id, ...val }));
       setPlayers(formatted);
-      const firstPlayerId = Object.keys(data)[0];
-      setHostId(firstPlayerId);
+      setHostId(formatted[0]?.id || null); // ✅ Host is the first one who joined
     });
 
     const promptRef = ref(db, `sessions/${sessionId()}/prompt`);
