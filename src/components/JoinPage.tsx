@@ -157,17 +157,46 @@ const JoinPage = () => {
 
           <section class="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-6">
             <h1 class="text-2xl font-bold mb-4">🎯 Quest Prompt</h1>
-            <p class="text-gray-300 mb-6 whitespace-pre-wrap">{prompt() || "Waiting for prompt to load..."}</p>
+
+            <Show when={!prompt()}>
+              <p class="text-gray-300 mb-6">Waiting for prompt to load...</p>
+            </Show>
 
             <Show when={isHost() && !prompt()}>
               <button class="mb-6 bg-green-600 hover:bg-green-700 py-2 px-4 rounded" onClick={generatePrompt}>✨ Generate Prompt</button>
             </Show>
 
             <Show when={prompt() && !roundComplete()}>
-              <textarea class="w-full bg-neutral-800 border border-neutral-600 text-white rounded-lg p-3 min-h-[120px]" placeholder="Write your response here..." value={response()} onInput={(e) => setResponse(e.currentTarget.value)} disabled={hasSubmitted()} />
-              <button class="mt-4 bg-red-600 hover:bg-red-700 py-2 px-4 rounded-lg disabled:opacity-50" onClick={handleSubmit} disabled={hasSubmitted() || !response().trim()}>
+              <p class="text-gray-300 mb-6 whitespace-pre-wrap">{prompt()}</p>
+              <textarea
+                class="w-full bg-neutral-800 border border-neutral-600 text-white rounded-lg p-3 min-h-[120px]"
+                placeholder="Write your response here..."
+                value={response()}
+                onInput={(e) => setResponse(e.currentTarget.value)}
+                disabled={hasSubmitted()}
+              />
+              <button
+                class="mt-4 bg-red-600 hover:bg-red-700 py-2 px-4 rounded-lg disabled:opacity-50"
+                onClick={handleSubmit}
+                disabled={hasSubmitted() || !response().trim()}
+              >
                 {hasSubmitted() ? "✔️ Submitted" : "🚀 Submit Response"}
               </button>
+            </Show>
+
+            <Show when={roundComplete()}>
+              <div class="bg-neutral-800 border border-neutral-600 p-4 rounded-lg">
+                <h2 class="text-xl font-semibold mb-2">🏆 Round Complete!</h2>
+                <p class="mb-2">🎉 <strong>{players().find(p => p.id === winnerId())?.name}</strong> won this round!</p>
+                <ul class="text-sm space-y-1">
+                  <For each={Object.entries(scores())}>
+                    {([pid, score]) => {
+                      const p = players().find(p => p.id === pid);
+                      return <li>{p?.name || pid}: {score}</li>;
+                    }}
+                  </For>
+                </ul>
+              </div>
             </Show>
           </section>
         </div>
