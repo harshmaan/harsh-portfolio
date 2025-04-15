@@ -15,10 +15,10 @@ import BasicLayout from "../../layouts/BasicLayout.astro";
     </a>
 
     <div class="grid gap-6">
-      <img src="/mar-ed1-2025-pg1.png" alt="Synapse March 2025 Page 1" class="rounded-lg shadow" />
-      <img src="/mar-ed1-2025-pg2.png" alt="Synapse March 2025 Page 2" class="rounded-lg shadow" />
-      <img src="/mar-ed1-2025-pg3.png" alt="Synapse March 2025 Page 3" class="rounded-lg shadow" />
-      <img src="/mar-ed1-2025-pg4.png" alt="Synapse March 2025 Page 4" class="rounded-lg shadow" />
+      <img src="/mar-ed1-2025-pg1.png" alt="Synapse Feb 2025 Page 1" class="rounded-lg shadow" />
+      <img src="/mar-ed1-2025-pg2.png" alt="Synapse Feb 2025 Page 2" class="rounded-lg shadow" />
+      <img src="/mar-ed1-2025-pg3.png" alt="Synapse Feb 2025 Page 3" class="rounded-lg shadow" />
+      <img src="/mar-ed1-2025-pg4.png" alt="Synapse Feb 2025 Page 4" class="rounded-lg shadow" />
     </div>
   </main>
 </BasicLayout>
