@@ -1,5 +1,6 @@
 ---
 import JoinPage from "../../components/JoinPage";
+const { sessionId } = Astro.params;
 ---
 
-<JoinPage client:only="solid" />
+<JoinPage client:only="solid" sessionId={sessionId} />
