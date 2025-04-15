@@ -1,4 +1,4 @@
-import BaseLayout from "../components/BaseLayout";
+import BasicLayout from "../layouts/BasicLayout.astro";
 import { createSignal, onMount, For, Show } from "solid-js";
 import { db } from "../lib/firebase";
 import { ref, set, onValue, update, remove } from "firebase/database";
