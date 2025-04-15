@@ -1,6 +1,12 @@
 import { createSignal, onMount, For, Show } from "solid-js";
 import { db } from "../lib/firebase";
-import { ref, set, onValue, update } from "firebase/database";
+import { ref, set, onValue, update, remove } from "firebase/database";
+
+// Simple scoring: compares responses to prompt length-wise
+const scoreResponse = (prompt: string, response: string): number => {
+  const lenDiff = Math.abs(prompt.length - response.length);
+  return Math.max(0, 100 - lenDiff);
+};
 
 const JoinPage = () => {
   const [name, setName] = createSignal("");
@@ -12,12 +18,16 @@ const JoinPage = () => {
   const [prompt, setPrompt] = createSignal("");
   const [response, setResponse] = createSignal("");
   const [hasSubmitted, setHasSubmitted] = createSignal(false);
+  const [scores, setScores] = createSignal<Record<string, number>>({});
+  const [roundComplete, setRoundComplete] = createSignal(false);
 
   const handleJoin = async () => {
     if (!name().trim() || !sessionId().trim()) return;
+
     const newPlayerId = crypto.randomUUID();
     setPlayerId(newPlayerId);
 
+    // Register player
     const playerRef = ref(db, `sessions/${sessionId()}/players/${newPlayerId}`);
     await set(playerRef, {
       name: name(),
@@ -27,7 +37,7 @@ const JoinPage = () => {
 
     setJoined(true);
 
-    // Fetch players
+    // Live update players
     const playersRef = ref(db, `sessions/${sessionId()}/players`);
     onValue(playersRef, (snapshot) => {
       const data = snapshot.val() || {};
@@ -38,10 +48,27 @@ const JoinPage = () => {
       setPlayers(formatted);
     });
 
-    // Fetch prompt
+    // Watch prompt
     const promptRef = ref(db, `sessions/${sessionId()}/prompt`);
     onValue(promptRef, (snapshot) => {
       setPrompt(snapshot.val() || "");
+    });
+
+    // Watch for round completion
+    const responsesRef = ref(db, `sessions/${sessionId()}/responses`);
+    onValue(responsesRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      const allResponded = players().length > 0 &&
+        players().every(p => p.responded);
+      if (allResponded) {
+        const promptText = prompt();
+        const newScores: Record<string, number> = {};
+        Object.entries(data).forEach(([pid, res]) => {
+          newScores[pid] = scoreResponse(promptText, res as string);
+        });
+        setScores(newScores);
+        setRoundComplete(true);
+      }
     });
   };
 
@@ -52,6 +79,19 @@ const JoinPage = () => {
     const playerRef = ref(db, `sessions/${sessionId()}/players/${playerId()}`);
     await update(playerRef, { responded: true });
     setHasSubmitted(true);
+  };
+
+  const startNewRound = async () => {
+    if (!sessionId()) return;
+    const responsesRef = ref(db, `sessions/${sessionId()}/responses`);
+    const playersRef = ref(db, `sessions/${sessionId()}/players`);
+    await remove(responsesRef);
+    await update(playersRef, Object.fromEntries(players().map(p => [p.id, { ...p, responded: false }])));
+    setPrompt("");
+    setResponse("");
+    setHasSubmitted(false);
+    setScores({});
+    setRoundComplete(false);
   };
 
   return (
@@ -94,6 +134,26 @@ const JoinPage = () => {
                 </div>
               )}
             </For>
+
+            <Show when={roundComplete()}>
+              <div class="mt-4 border-t border-neutral-700 pt-2">
+                <h3 class="text-sm font-semibold">🏆 Scores</h3>
+                <ul class="text-xs mt-1">
+                  <For each={Object.entries(scores())}>
+                    {([pid, score]) => {
+                      const p = players().find(p => p.id === pid);
+                      return <li>{p?.name || pid}: {score} points</li>;
+                    }}
+                  </For>
+                </ul>
+                <button
+                  onClick={startNewRound}
+                  class="mt-3 text-sm bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded"
+                >
+                  🔄 Start New Round
+                </button>
+              </div>
+            </Show>
           </aside>
 
           <section class="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-6">
