@@ -1,54 +1,43 @@
-// File: src/pages/prompt-quest/index.astro
 ---
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-const [name, setName] = useState("");
-const [sessionId, setSessionId] = useState("");
-const navigate = useNavigate();
-
-function joinGame(e) {
-  e.preventDefault();
-  if (name.trim() && sessionId.trim()) {
-    localStorage.setItem("promptQuestName", name);
-    navigate(`/prompt-quest/game/${sessionId}`);
-  }
-}
+// src/pages/prompt-quest/index.astro
+import { useState } from "solid-js/web";
 ---
 
-<main class="min-h-screen bg-[#0d0d0d] text-white flex items-center justify-center px-4">
-  <form class="bg-neutral-900 p-8 rounded-lg max-w-md w-full space-y-6 border border-neutral-700 shadow-xl" onSubmit={joinGame}>
-    <h1 class="text-2xl font-bold text-center">🎮 Join Prompt Quest</h1>
-
-    <div>
-      <label class="block text-sm mb-1">Your Name</label>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        class="w-full px-4 py-2 rounded bg-neutral-800 border border-neutral-700 text-white"
-        placeholder="e.g. Harsh"
-        required
-      />
-    </div>
-
-    <div>
-      <label class="block text-sm mb-1">Game Session ID</label>
-      <input
-        type="text"
-        value={sessionId}
-        onChange={(e) => setSessionId(e.target.value)}
-        class="w-full px-4 py-2 rounded bg-neutral-800 border border-neutral-700 text-white"
-        placeholder="e.g. session123"
-        required
-      />
-    </div>
-
-    <button
-      type="submit"
-      class="w-full bg-red-600 hover:bg-red-700 py-2 rounded-lg font-medium transition text-white"
+<html lang="en">
+  <body class="bg-black text-white p-6 flex flex-col items-center justify-center min-h-screen">
+    <h1 class="text-3xl mb-4">Join Prompt Quest</h1>
+    <form
+      on:submit={(e) => {
+        e.preventDefault();
+        const name = e.target.name.value;
+        const sessionId = e.target.sessionId.value;
+        if (name && sessionId) {
+          localStorage.setItem("promptQuestName", name);
+          window.location.href = `/prompt-quest/join?sessionId=${sessionId}`;
+        }
+      }}
+      class="flex flex-col gap-4 w-full max-w-md"
     >
-      🚀 Join Game
-    </button>
-  </form>
-</main>
+      <input
+        type="text"
+        name="name"
+        placeholder="Enter your name"
+        class="p-2 rounded bg-neutral-800 border border-neutral-600 text-white"
+        required
+      />
+      <input
+        type="text"
+        name="sessionId"
+        placeholder="Enter session ID"
+        class="p-2 rounded bg-neutral-800 border border-neutral-600 text-white"
+        required
+      />
+      <button
+        type="submit"
+        class="bg-red-600 hover:bg-red-700 py-2 px-4 rounded"
+      >
+        Join Game
+      </button>
+    </form>
+  </body>
+</html>
