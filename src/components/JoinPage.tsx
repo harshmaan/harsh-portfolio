@@ -85,25 +85,21 @@ const JoinPage = () => {
 
   const handleSubmit = async () => {
     const responseVal = response();
+    const playerPath = `sessions/${sessionId()}/players/${playerId()}`;
+  
     await set(ref(db, `sessions/${sessionId()}/responses/${playerId()}`), responseVal);
-    await update(ref(db, `sessions/${sessionId()}/players/${playerId()}`), { responded: true });
+    await update(ref(db, playerPath), { responded: true });
     setHasSubmitted(true);
+  
+    // Force refresh player state after submission to ensure up-to-date "responded" status
+    const playersRef = ref(db, `sessions/${sessionId()}/players`);
+    onValue(playersRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      const formatted = Object.entries(data).map(([id, val]: any) => ({ id, ...val }));
+      setPlayers(formatted);
+    });
   };
 
-  const startNewRound = async () => {
-    await remove(ref(db, `sessions/${sessionId()}/responses`));
-    const updates: any = {};
-    players().forEach((p) => {
-      updates[p.id] = { ...p, responded: false };
-    });
-    await update(ref(db, `sessions/${sessionId()}/players`), updates);
-    await set(ref(db, `sessions/${sessionId()}/prompt`), "");
-    setPrompt("");
-    setResponse("");
-    setScores({});
-    setHasSubmitted(false);
-    setRoundComplete(false);
-  };
 
   const generatePrompt = async () => {
     const res = await fetch("/api/gemini", {
