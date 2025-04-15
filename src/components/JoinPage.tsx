@@ -134,7 +134,7 @@ const JoinPage = () => {
   };
 
   return (
-    <BaseLayout title="Prompt Quest" description="A quirky multiplayer writing game using LLMs!">
+    <BasicLayout title="Prompt Quest" description="A quirky multiplayer writing game using LLMs!">
       <main class="p-6 w-full max-w-screen-lg">
         <Show when={!joined()}>
           <div class="max-w-md mx-auto space-y-4">
@@ -221,7 +221,7 @@ const JoinPage = () => {
           </div>
         </Show>
       </main>
-    </BaseLayout>
+    </BasicLayout>
   );
 };
 
