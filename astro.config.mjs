@@ -24,8 +24,7 @@ export default defineConfig({
     solidJs(),
     UnoCSS({ injectReset: true }),
     icon(),
-    svelte(),
-    react()
+    svelte()
   ],
   markdown: {
     remarkPlugins: [remarkReadingTime],
