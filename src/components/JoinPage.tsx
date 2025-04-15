@@ -233,15 +233,21 @@ const JoinPage = () => {
               <div class="bg-neutral-800 border border-neutral-600 p-4 rounded-lg">
                 <p class="mb-2">🎉 <strong>{players().find(p => p.id === winnerId())?.name}</strong> won this round!</p>
                 <Show when={winnerId()}>
+                  <div class="mt-2 text-sm text-gray-300">
+                     📝 <strong>Winning Response:</strong>
+                     <br />
+                     <Show when={players().length}>
+                       {() => {
+                         const responseRef = ref(db, `sessions/${sessionId()}/responses/${winnerId()}`);
+                         onValue(responseRef, (snap) => {
+                           const val = snap.val();
+                           if (val) setResponse(val);
+                         });
+                         return <p class="mt-1 italic">{response()}</p>;
+                       }}
+                     </Show>
+                   </div>
                 </Show>
-                <ul class="text-sm space-y-1">
-                  <For each={Object.entries(scores())}>
-                    {([pid, score]) => {
-                      const p = players().find(p => p.id === pid);
-                      return <li>{p?.name || pid}: {score}</li>;
-                    }}
-                  </For>
-                </ul>
               </div>
             </Show>
           </section>
