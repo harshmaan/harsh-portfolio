@@ -138,9 +138,16 @@ const JoinPage = () => {
     const data = await res.json();
     await set(ref(db, `sessions/${sessionId()}/prompt`), data.response);
   };
-
+  
   return (
     <main class="p-6 w-full max-w-screen-xl mx-auto text-white overflow-x-hidden overflow-y-auto min-h-screen">
+      {/* ← Back button - shows on all pages */}
+      <a
+        class="text-white absolute bg-neutral-900 hover:bg-neutral-800 top-4 left-4 px-4 py-2 border border-neutral-600 rounded-lg text-sm z-50"
+        href="/"
+      >
+        ← Back
+      </a>
       <Show when={!joined()}>
         <div class="max-w-md mx-auto space-y-4">
           <h1 class="text-2xl font-bold">🎮 Join Prompt Quest</h1>
@@ -212,6 +219,22 @@ const JoinPage = () => {
               <div class="bg-neutral-800 border border-neutral-600 p-4 rounded-lg">
                 <h2 class="text-xl font-semibold mb-2">🏆 Round Complete!</h2>
                 <p class="mb-2">🎉 <strong>{players().find(p => p.id === winnerId())?.name}</strong> won this round!</p>
+                <Show when={winnerId()}>
+                  <div class="mt-2 text-sm text-gray-300">
+                    📝 <strong>Winning Response:</strong>
+                    <br />
+                    <Show when={players().length}>
+                      {() => {
+                        const responseRef = ref(db, `sessions/${sessionId()}/responses/${winnerId()}`);
+                        onValue(responseRef, (snap) => {
+                          const val = snap.val();
+                          if (val) setResponse(val);
+                        });
+                        return <p class="mt-1 italic">{response()}</p>;
+                      }}
+                    </Show>
+                  </div>
+                </Show>
                 <ul class="text-sm space-y-1">
                   <For each={Object.entries(scores())}>
                     {([pid, score]) => {
