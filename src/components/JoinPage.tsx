@@ -132,7 +132,7 @@ const JoinPage = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         prompt:
-          "You are a playful game master designing creative, lighthearted challenges for a multiplayer storytelling game called Prompt Quest. Generate one funny, corporate-themed challenge where the player must convince someone or something in a typical workplace to do something. The character should be related to office life — like coworkers, bosses, HR, interns. The goal should be realistic or relatable, with a humorous twist. Avoid fantasy, complex logic, or niche references. Keep it simple and fun. Format: “Convince <workplace being> to <do something>.” Examples: “Convince your manager to approve a week off with no questions asked.” “Convince HR to let you bring your pet llama to the team meeting.” “Convince the intern that you’re actually the CEO in disguise.” Now generate ONE corporate-themed convincing challenge. give this in a single line as a single string — ”Convince your coworker to switch desks because your chair has emotional attachment issues.”",
+          "You are a playful game master designing creative, lighthearted challenges for a multiplayer storytelling game called Prompt Quest. Generate one funny, corporate-themed challenge where the player must convince someone or something in a typical workplace to do something. The character should be related to office life — like coworkers, bosses, HR, interns. The goal should be realistic or relatable, with a humorous twist. Avoid fantasy, complex logic, or niche references. Keep it simple and fun. Format: “Convince <workplace being> to <do something>.” Examples: “Convince your manager to approve a week off with no questions asked.” “Convince HR to let you bring your pet llama to the team meeting.” “Convince the intern that you’re actually the CEO in disguise.” Now generate ONE corporate-themed convincing challenge.”",
       }),
     });
     const data = await res.json();
@@ -233,20 +233,6 @@ const JoinPage = () => {
               <div class="bg-neutral-800 border border-neutral-600 p-4 rounded-lg">
                 <p class="mb-2">🎉 <strong>{players().find(p => p.id === winnerId())?.name}</strong> won this round!</p>
                 <Show when={winnerId()}>
-                  <div class="mt-2 text-sm text-gray-300">
-                    📝 <strong>Winning Response:</strong>
-                    <br />
-                    <Show when={players().length}>
-                      {() => {
-                        const responseRef = ref(db, `sessions/${sessionId()}/responses/${winnerId()}`);
-                        onValue(responseRef, (snap) => {
-                          const val = snap.val();
-                          if (val) setResponse(val);
-                        });
-                        return <p class="mt-1 italic">{response()}</p>;
-                      }}
-                    </Show>
-                  </div>
                 </Show>
                 <ul class="text-sm space-y-1">
                   <For each={Object.entries(scores())}>
