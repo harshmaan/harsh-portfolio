@@ -2,95 +2,120 @@ import { createSignal, onMount, For, Show } from "solid-js";
 import { db } from "../lib/firebase";
 import { ref, set, onValue, update, remove } from "firebase/database";
 
-// Simple scoring: compares responses to prompt length-wise
-const scoreResponse = (prompt: string, response: string): number => {
-  const lenDiff = Math.abs(prompt.length - response.length);
-  return Math.max(0, 100 - lenDiff);
-};
-
 const JoinPage = () => {
   const [name, setName] = createSignal("");
   const [sessionId, setSessionId] = createSignal("");
   const [joined, setJoined] = createSignal(false);
   const [playerId, setPlayerId] = createSignal("");
-
   const [players, setPlayers] = createSignal<any[]>([]);
+
   const [prompt, setPrompt] = createSignal("");
   const [response, setResponse] = createSignal("");
   const [hasSubmitted, setHasSubmitted] = createSignal(false);
   const [scores, setScores] = createSignal<Record<string, number>>({});
   const [roundComplete, setRoundComplete] = createSignal(false);
 
+  // Check if this player is the "host" (first player)
+  const isHost = () => players().length > 0 && players()[0]?.id === playerId();
+
+  // 🎯 Score using Gemini model
+  const scoreWithLLM = async (responses: Record<string, string>) => {
+    const formatted = Object.entries(responses)
+      .map(([pid, res]) => `Player ${pid}: ${res}`)
+      .join("\n");
+
+    const promptText = `Evaluate these player responses to the prompt:\n\n"${prompt()}"\n\n${formatted}\n\nGive a JSON of playerId to score like { "playerId1": 90, "playerId2": 85 }`;
+
+    const res = await fetch("/api/gemini", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: promptText }),
+    });
+
+    const data = await res.json();
+    try {
+      const parsed = JSON.parse(data.response);
+      setScores(parsed);
+    } catch {
+      console.error("Gemini LLM failed to return JSON, fallback to manual scoring");
+    }
+  };
+
   const handleJoin = async () => {
     if (!name().trim() || !sessionId().trim()) return;
 
-    const newPlayerId = crypto.randomUUID();
-    setPlayerId(newPlayerId);
+    const newId = crypto.randomUUID();
+    setPlayerId(newId);
 
-    // Register player
-    const playerRef = ref(db, `sessions/${sessionId()}/players/${newPlayerId}`);
+    const playerRef = ref(db, `sessions/${sessionId()}/players/${newId}`);
     await set(playerRef, {
       name: name(),
       responded: false,
-      readyNextRound: false,
     });
 
     setJoined(true);
 
-    // Live update players
     const playersRef = ref(db, `sessions/${sessionId()}/players`);
     onValue(playersRef, (snapshot) => {
       const data = snapshot.val() || {};
-      const formatted = Object.entries(data).map(([id, val]: any) => ({
-        id,
-        ...val,
-      }));
-      setPlayers(formatted);
+      const list = Object.entries(data).map(([id, val]: any) => ({ id, ...val }));
+      setPlayers(list);
     });
 
-    // Watch prompt
     const promptRef = ref(db, `sessions/${sessionId()}/prompt`);
-    onValue(promptRef, (snapshot) => {
-      setPrompt(snapshot.val() || "");
-    });
+    onValue(promptRef, (snapshot) => setPrompt(snapshot.val() || ""));
 
-    // Watch for round completion
     const responsesRef = ref(db, `sessions/${sessionId()}/responses`);
-    onValue(responsesRef, (snapshot) => {
+    onValue(responsesRef, async (snapshot) => {
       const data = snapshot.val() || {};
-      const allResponded = players().length > 0 &&
-        players().every(p => p.responded);
+      const allResponded = players().length > 0 && players().every(p => p.responded);
       if (allResponded) {
-        const promptText = prompt();
-        const newScores: Record<string, number> = {};
-        Object.entries(data).forEach(([pid, res]) => {
-          newScores[pid] = scoreResponse(promptText, res as string);
-        });
-        setScores(newScores);
+        await scoreWithLLM(data);
         setRoundComplete(true);
       }
     });
   };
 
+  const generatePrompt = async () => {
+    const res = await fetch("/api/gemini", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        prompt: "Give a fun, creative prompt for an AI-powered group game.",
+      }),
+    });
+
+    const data = await res.json();
+    const generated = data.response?.trim();
+    if (generated) {
+      const promptRef = ref(db, `sessions/${sessionId()}/prompt`);
+      await set(promptRef, generated);
+    }
+  };
+
   const handleSubmit = async () => {
-    const responseVal = response();
-    const responseRef = ref(db, `sessions/${sessionId()}/responses/${playerId()}`);
-    await set(responseRef, responseVal);
+    const res = response();
+    const resRef = ref(db, `sessions/${sessionId()}/responses/${playerId()}`);
+    await set(resRef, res);
+
     const playerRef = ref(db, `sessions/${sessionId()}/players/${playerId()}`);
     await update(playerRef, { responded: true });
+
     setHasSubmitted(true);
   };
 
   const startNewRound = async () => {
-    if (!sessionId()) return;
-    const responsesRef = ref(db, `sessions/${sessionId()}/responses`);
-    const playersRef = ref(db, `sessions/${sessionId()}/players`);
-    await remove(responsesRef);
-    await update(playersRef, Object.fromEntries(players().map(p => [p.id, { ...p, responded: false }])));
-    setPrompt("");
+    await remove(ref(db, `sessions/${sessionId()}/responses`));
+    const updates: any = {};
+    players().forEach((p) => {
+      updates[p.id] = { ...p, responded: false };
+    });
+    await update(ref(db, `sessions/${sessionId()}/players`), updates);
+    await set(ref(db, `sessions/${sessionId()}/prompt`), "");
     setResponse("");
-    setHasSubmitted(false);
+    setPrompt("");
     setScores({});
+    setHasSubmitted(false);
     setRoundComplete(false);
   };
 
@@ -122,18 +147,28 @@ const JoinPage = () => {
 
       <Show when={joined()}>
         <div class="flex flex-col md:flex-row gap-6 mt-6">
-          <aside class="w-full md:w-1/4 bg-neutral-900 border border-neutral-700 rounded-xl p-4 space-y-3">
+          {/* Players Panel */}
+          <aside class="w-full md:w-1/4 bg-neutral-900 border border-neutral-700 rounded-xl p-4">
             <h2 class="text-lg font-semibold mb-2">🧑‍🤝‍🧑 Players</h2>
             <For each={players()}>
-              {(player) => (
-                <div class="flex items-center justify-between text-sm" key={player.id}>
-                  <span>{player.name}</span>
+              {(p) => (
+                <div class="flex justify-between text-sm" key={p.id}>
+                  <span>{p.name}</span>
                   <span class="text-xs text-gray-400">
-                    {player.responded ? "✅ Responded" : "⌛ Waiting"}
+                    {p.responded ? "✅" : "⌛"}
                   </span>
                 </div>
               )}
             </For>
+
+            <Show when={isHost() && !prompt()}>
+              <button
+                class="mt-4 text-sm bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded"
+                onClick={generatePrompt}
+              >
+                🎲 Generate Prompt
+              </button>
+            </Show>
 
             <Show when={roundComplete()}>
               <div class="mt-4 border-t border-neutral-700 pt-2">
@@ -141,8 +176,8 @@ const JoinPage = () => {
                 <ul class="text-xs mt-1">
                   <For each={Object.entries(scores())}>
                     {([pid, score]) => {
-                      const p = players().find(p => p.id === pid);
-                      return <li>{p?.name || pid}: {score} points</li>;
+                      const player = players().find(p => p.id === pid);
+                      return <li>{player?.name || pid}: {score}</li>;
                     }}
                   </For>
                 </ul>
@@ -150,15 +185,18 @@ const JoinPage = () => {
                   onClick={startNewRound}
                   class="mt-3 text-sm bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded"
                 >
-                  🔄 Start New Round
+                  🔄 New Round
                 </button>
               </div>
             </Show>
           </aside>
 
+          {/* Game Area */}
           <section class="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl p-6">
             <h1 class="text-2xl font-bold mb-4">🎯 Quest Prompt</h1>
-            <p class="text-gray-300 mb-6">{prompt() || "Waiting for prompt to load..."}</p>
+            <p class="text-gray-300 mb-6">
+              {prompt() || "Waiting for prompt to load..."}
+            </p>
 
             <textarea
               class="w-full bg-neutral-800 border border-neutral-600 text-white rounded-lg p-3 min-h-[120px]"
@@ -173,7 +211,7 @@ const JoinPage = () => {
               onClick={handleSubmit}
               disabled={hasSubmitted() || !response().trim()}
             >
-              {hasSubmitted() ? "✔️ Submitted" : "🚀 Submit Response"}
+              {hasSubmitted() ? "✔️ Submitted" : "🚀 Submit"}
             </button>
           </section>
         </div>
