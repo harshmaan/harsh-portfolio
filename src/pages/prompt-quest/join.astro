@@ -1,5 +1,8 @@
 ---
-import JoinPage from "../../components/JoinPage";
+import JoinPage from "../../components/JoinPage.tsx";
+import BasicLayout from "../../layouts/BasicLayout.astro";
 ---
 
-<JoinPage client:only="solid" />
+<BasicLayout title="Prompt Quest" description="A quirky multiplayer writing game using LLMs!">
+  <JoinPage client:load />
+</BasicLayout>
