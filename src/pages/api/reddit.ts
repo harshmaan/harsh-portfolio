@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
-  const query = url.searchParams.get("query");
+  const query = url.searchParams.get("name");
 
   if (!query) {
     return new Response(
