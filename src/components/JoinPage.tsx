@@ -55,6 +55,7 @@ const JoinPage = () => {
       // ✅ Always reset for new prompt
       setHasSubmitted(false);
       setResponse("");
+      setMyResponse("");
     
       // 🧼 Optional: clear scores if prompt is empty (initial state)
       if (!val) {
