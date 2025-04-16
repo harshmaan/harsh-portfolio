@@ -68,12 +68,22 @@ Reddit Posts:
 ${postTexts}
 `.trim();
 
+    console.log("🧠 Gemini Prompt:", prompt); // helpful for debugging in logs
+
     const result = await model.generateContent(prompt);
+
+    if (!result || !result.response) {
+      return new Response(JSON.stringify({ error: "Empty Gemini response" }), { status: 500 });
+    }
 
     const text = await result.response.text();
 
+    if (!text || !text.trim()) {
+      return new Response(JSON.stringify({ error: "No insights generated." }), { status: 500 });
+    }
+
     return new Response(
-      JSON.stringify({ response: text }),
+      JSON.stringify({ report: text }),
       { status: 200 }
     );
   } catch (err: any) {
