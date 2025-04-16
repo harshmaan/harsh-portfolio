@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
-  const query = url.searchParams.get("query");
+  const query = url.searchParams.get("name"); // changed from "query" to "name"
 
   if (!query) {
     return new Response(
@@ -32,7 +32,7 @@ export const GET: APIRoute = async ({ request }) => {
     });
   } catch (err) {
     return new Response(
-      JSON.stringify({ error: "Failed to fetch Reddit data", details: err }),
+      JSON.stringify({ error: "Failed to fetch Reddit data", details: (err as Error).message }),
       { status: 500 }
     );
   }
