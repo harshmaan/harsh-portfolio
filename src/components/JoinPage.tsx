@@ -157,27 +157,30 @@ const JoinPage = () => {
       </a>
 
       <Show when={!joined()}>
-        <div class="max-w-md mx-auto space-y-4">
-          <h1 class="text-2xl font-bold">Enter the Arena</h1>
-          <input class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white" placeholder="Enter your name" value={name()} onInput={(e) => setName(e.currentTarget.value)} />
-          <input class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white" placeholder="Enter session ID" value={sessionId()} onInput={(e) => setSessionId(e.currentTarget.value)} />
-          <button
-            class="w-full bg-red-600 hover:bg-red-700 py-2 rounded disabled:opacity-50"
-            disabled={!name().trim() || !sessionId().trim()}
-            onClick={async () => {
-              console.log("Joining with name:", name(), "Session ID:", sessionId());
-              try {
-                await handleJoin();
-              } catch (err) {
-                console.error("Join failed:", err);
-                alert("Something went wrong while joining. Please try again.");
-              }
-            }}
-          >
-            🚀 Join Game
-          </button>
+        <div class="flex justify-center items-center min-h-[80vh]">
+          <div class="max-w-md w-full space-y-4 text-center">
+            <h1 class="text-3xl font-bold">Enter the Arena</h1>
+            <input class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white" placeholder="Enter your name" value={name()} onInput={(e) => setName(e.currentTarget.value)} />
+            <input class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white" placeholder="Enter session ID" value={sessionId()} onInput={(e) => setSessionId(e.currentTarget.value)} />
+            <button
+              class="w-full bg-red-600 hover:bg-red-700 py-2 rounded disabled:opacity-50"
+              disabled={!name().trim() || !sessionId().trim()}
+              onClick={async () => {
+                console.log("Joining with name:", name(), "Session ID:", sessionId());
+                try {
+                  await handleJoin();
+                } catch (err) {
+                  console.error("Join failed:", err);
+                  alert("Something went wrong while joining. Please try again.");
+                }
+              }}
+            >
+              🚀 Join Game
+            </button>
+          </div>
         </div>
       </Show>
+
 
       <Show when={joined()}>
         <div class="flex flex-col md:flex-row gap-6 mt-6 max-w-full">
