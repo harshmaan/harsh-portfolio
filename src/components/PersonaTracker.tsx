@@ -15,7 +15,11 @@ const PersonaTracker = () => {
     setReport("");
 
     try {
-      const res = await fetch(`https://www.reddit.com/search.json?q=${encodeURIComponent(cxoName())}&limit=10`, {
+      // 🔁 Use CORS proxy for Reddit fetch to work on mobile
+      const proxyUrl = "https://corsproxy.io/?";
+      const redditUrl = `https://www.reddit.com/search.json?q=${encodeURIComponent(cxoName())}&limit=10`;
+
+      const res = await fetch(`${proxyUrl}${redditUrl}`, {
         headers: {
           "User-Agent": "Mozilla/5.0",
           "Accept": "application/json",
