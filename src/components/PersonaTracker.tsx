@@ -1,47 +1,68 @@
-import { useState } from "react";
+import { createSignal, Show, For } from "solid-js";
 
-export default function PersonaTracker() {
-  const [name, setName] = useState("");
-  const [posts, setPosts] = useState<any[]>([]);
+const PersonaTracker = () => {
+  const [cxoName, setCxoName] = createSignal("");
+  const [loading, setLoading] = createSignal(false);
+  const [posts, setPosts] = createSignal<any[]>([]);
+  const [error, setError] = createSignal("");
 
-  const fetchPosts = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch(`/api/reddit?query=${encodeURIComponent(name)}`);
-    const data = await res.json();
-    setPosts(data.posts || []);
+  const handleSearch = async () => {
+    if (!cxoName().trim()) return;
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/reddit?name=${encodeURIComponent(cxoName())}`);
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setPosts(data.posts || []);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="text-white max-w-2xl mx-auto mt-12 space-y-6 px-4">
-      <h1 className="text-3xl font-bold">🔎 Persona Tracker</h1>
-      <p className="text-neutral-400">
-        Enter a CXO’s name below to analyze how they’re being perceived on Reddit.
-      </p>
+    <div class="max-w-xl mx-auto w-full p-6 bg-neutral-900 rounded-lg border border-neutral-700 text-white">
+      <h1 class="text-2xl font-bold mb-4 text-center">📣 Persona Tracker</h1>
 
-      <form className="flex flex-col gap-4" onSubmit={fetchPosts}>
+      <div class="flex items-center gap-2 mb-4">
         <input
           type="text"
-          placeholder="Enter CXO name (e.g., Julie Sweet)"
-          className="bg-neutral-800 border border-neutral-600 p-3 rounded text-white w-full"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          placeholder="Enter CXO name (e.g. Julie Sweet)"
+          value={cxoName()}
+          onInput={(e) => setCxoName(e.currentTarget.value)}
+          class="flex-1 px-4 py-2 rounded bg-neutral-800 border border-neutral-600 text-white"
         />
         <button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          onClick={handleSearch}
+          class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm"
+          disabled={loading()}
         >
-          🚀 Analyze
+          {loading() ? "Loading..." : "Search"}
         </button>
-      </form>
+      </div>
 
-      <ul className="space-y-3">
-        {posts.map((post, idx) => (
-          <li key={idx} className="border border-neutral-700 p-3 rounded bg-neutral-900">
-            <strong>{post.title}</strong>
-            <p className="text-sm text-gray-400">{post.selftext}</p>
-          </li>
-        ))}
-      </ul>
+      <Show when={error()}>
+        <p class="text-red-500 text-sm mb-2">{error()}</p>
+      </Show>
+
+      <Show when={posts().length > 0}>
+        <div class="space-y-3 mt-4 max-h-[400px] overflow-y-auto">
+          <For each={posts()}>
+            {(post: any) => (
+              <div class="border border-neutral-700 p-3 rounded bg-neutral-800">
+                <a href={`https://www.reddit.com${post.permalink}`} target="_blank" class="text-blue-400 hover:underline text-sm font-medium">
+                  {post.title}
+                </a>
+                <p class="text-gray-400 text-xs mt-1">👍 {post.ups} | 💬 {post.num_comments} | 🧵 r/{post.subreddit}</p>
+              </div>
+            )}
+          </For>
+        </div>
+      </Show>
     </div>
   );
-}
+};
+
+export default PersonaTracker;
