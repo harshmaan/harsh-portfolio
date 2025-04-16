@@ -10,13 +10,31 @@ const PersonaTracker = () => {
     if (!cxoName().trim()) return;
     setLoading(true);
     setError("");
+    setPosts([]);
+
     try {
-      const res = await fetch(`/api/reddit?name=${encodeURIComponent(cxoName())}`);
+      const res = await fetch(`https://www.reddit.com/search.json?q=${encodeURIComponent(cxoName())}&limit=10`, {
+        headers: {
+          "User-Agent": "Mozilla/5.0", // optional but safe
+          "Accept": "application/json",
+        },
+      });
+
       const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      setPosts(data.posts || []);
+      const children = data?.data?.children || [];
+
+      const cleaned = children.map((child: any) => ({
+        title: child.data.title,
+        permalink: child.data.permalink,
+        ups: child.data.ups,
+        num_comments: child.data.num_comments,
+        subreddit: child.data.subreddit,
+      }));
+
+      setPosts(cleaned);
     } catch (err: any) {
-      setError(err.message || "Something went wrong");
+      setError("Failed to fetch Reddit posts");
+      console.error("Reddit fetch error:", err);
     } finally {
       setLoading(false);
     }
@@ -52,11 +70,16 @@ const PersonaTracker = () => {
           <For each={posts()}>
             {(post: any) => (
               <div class="border border-neutral-700 p-3 rounded bg-neutral-800">
-                <a href={post.url} target="_blank" class="text-blue-400 hover:underline text-sm font-medium">
+                <a
+                  href={`https://www.reddit.com${post.permalink}`}
+                  target="_blank"
+                  class="text-blue-400 hover:underline text-sm font-medium"
+                >
                   {post.title}
                 </a>
-                <p class="text-gray-300 text-xs mt-1">{post.selftext}</p>
-                <p class="text-gray-400 text-xs mt-1">👍 {post.score} | 🧵 r/{post.subreddit}</p>
+                <p class="text-gray-400 text-xs mt-1">
+                  👍 {post.ups} | 💬 {post.num_comments} | 🧵 r/{post.subreddit}
+                </p>
               </div>
             )}
           </For>
