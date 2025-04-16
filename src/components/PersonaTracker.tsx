@@ -55,9 +55,8 @@ const PersonaTracker = () => {
                 <a href={post.url} target="_blank" class="text-blue-400 hover:underline text-sm font-medium">
                   {post.title}
                 </a>
-                <p class="text-gray-400 text-xs mt-1">
-                  👍 {post.score} | 🧵 r/{post.subreddit}
-                </p>
+                <p class="text-gray-300 text-xs mt-1">{post.selftext}</p>
+                <p class="text-gray-400 text-xs mt-1">👍 {post.score} | 🧵 r/{post.subreddit}</p>
               </div>
             )}
           </For>
