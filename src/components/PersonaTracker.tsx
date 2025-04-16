@@ -5,17 +5,20 @@ const PersonaTracker = () => {
   const [loading, setLoading] = createSignal(false);
   const [posts, setPosts] = createSignal<any[]>([]);
   const [error, setError] = createSignal("");
+  const [report, setReport] = createSignal("");
 
   const handleSearch = async () => {
     if (!cxoName().trim()) return;
     setLoading(true);
     setError("");
     setPosts([]);
+    setReport("");
 
     try {
+      // Fetch Reddit posts
       const res = await fetch(`https://www.reddit.com/search.json?q=${encodeURIComponent(cxoName())}&limit=10`, {
         headers: {
-          "User-Agent": "Mozilla/5.0", // optional but safe
+          "User-Agent": "Mozilla/5.0",
           "Accept": "application/json",
         },
       });
@@ -32,9 +35,22 @@ const PersonaTracker = () => {
       }));
 
       setPosts(cleaned);
+
+      // Fetch persona report using Gemini
+      const reportRes = await fetch("/api/persona-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: cxoName(),
+          posts: cleaned.map((p) => p.title), // You can add `selftext` if you want
+        }),
+      });
+
+      const reportData = await reportRes.json();
+      setReport(reportData.report || "No insights generated.");
     } catch (err: any) {
-      setError("Failed to fetch Reddit posts");
-      console.error("Reddit fetch error:", err);
+      setError("Failed to fetch data");
+      console.error("Tracker error:", err);
     } finally {
       setLoading(false);
     }
@@ -83,6 +99,13 @@ const PersonaTracker = () => {
               </div>
             )}
           </For>
+        </div>
+      </Show>
+
+      <Show when={report()}>
+        <div class="mt-6 p-4 border border-neutral-700 bg-neutral-800 rounded-lg text-sm whitespace-pre-wrap">
+          <h2 class="font-semibold text-white mb-2">🧠 AI Insight Report</h2>
+          <p class="text-gray-300">{report()}</p>
         </div>
       </Show>
     </div>
