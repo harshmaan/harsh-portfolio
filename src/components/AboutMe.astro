@@ -3,10 +3,9 @@
 import Card from "./Card/index.astro";
 ---
 
-<div class="flex flex-col gap-4 h-full">
-  <!-- Card 1: About Me -->
-  <Card colSpan="md:col-span-1" rowSpan="md:row-span-3" title="About me">
-    <div class="text-sm font-light space-y-2">
+<Card colSpan="md:col-span-1" rowSpan="md:row-span-6" title="About me">
+  <div class="flex flex-col gap-2 h-full justify-between">
+    <div class="text-sm font-light">
       <p>My primary tools of choice includes:</p>
       <ul class="list-disc list-inside">
         <li>LangChain</li>
@@ -16,29 +15,29 @@ import Card from "./Card/index.astro";
         <li>Python</li>
         <li>SQL</li>
       </ul>
-
-      <p>Beyond the code editor, you’ll usually find me:</p>
-      <ul class="list-disc list-inside">
-        <li>Competing in esports</li>
-        <li>Exploring nature</li>
-        <li>Experimenting and building AI apps</li>
-      </ul>
     </div>
-  </Card>
 
-  <!-- Card 2: Prompt Quest -->
-  <Card colSpan="md:col-span-1" rowSpan="md:row-span-3" title="Prompt Quest">
-    <div class="flex flex-col justify-between h-full">
-      <p class="text-sm font-light">
-        <strong>I’ve just launched my first AI powered game — Prompt Quest! Give it a try and let me know what you think.</strong>
-      </p>
-      <a href="/prompt-quest/join" class="mt-4">
-        <button
-          class="w-full border-2 border-red-500 border-b-[3px] text-white bg-transparent hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg transition text-sm font-medium"
-        >
-          🧩 Play Prompt Quest
-        </button>
-      </a>
-    </div>
-  </Card>
-</div>
+    <p class="text-sm font-light">
+      Beyond the code editor, you’ll usually find me:
+    </p>
+    <ul class="list-disc list-inside text-sm font-light">
+      <li>Competing in esports</li>
+      <li>Exploring nature</li>
+      <li>Experimenting and building AI apps</li>
+    </ul>
+
+    <!-- New line about the game -->
+    <p class="text-sm font-light mt-4">
+      <strong>I’ve just launched my first AI powered game — Prompt Quest! Give it a try and let me know what you think.</strong>
+    </p>
+
+    <!-- 🧩 Play Prompt Quest Button -->
+    <a href="/prompt-quest/join" class="mt-4">
+      <button
+        class="w-full border-2 border-red-500 border-b-[3px] text-white bg-transparent hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg transition text-sm font-medium"
+      >
+        🧩 Play Prompt Quest
+      </button>
+    </a>
+  </div>
+</Card>
