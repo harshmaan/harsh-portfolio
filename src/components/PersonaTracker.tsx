@@ -15,7 +15,6 @@ const PersonaTracker = () => {
     setReport("");
 
     try {
-      // 1️⃣ Fetch Reddit posts
       const res = await fetch(`https://www.reddit.com/search.json?q=${encodeURIComponent(cxoName())}&limit=10`, {
         headers: {
           "User-Agent": "Mozilla/5.0",
@@ -28,7 +27,7 @@ const PersonaTracker = () => {
 
       const cleaned = children.map((child: any) => ({
         title: child.data.title,
-        selftext: child.data.selftext || "", // ✅ Add selftext
+        selftext: child.data.selftext || "",
         permalink: child.data.permalink,
         ups: child.data.ups,
         num_comments: child.data.num_comments,
@@ -37,13 +36,12 @@ const PersonaTracker = () => {
 
       setPosts(cleaned);
 
-      // 2️⃣ Fetch AI Insight Report
       const reportRes = await fetch("/api/persona-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: cxoName(),
-          posts: cleaned, // ✅ Full objects
+          posts: cleaned,
         }),
       });
 
@@ -104,7 +102,7 @@ const PersonaTracker = () => {
       </Show>
 
       <Show when={report()}>
-        <div class="mt-6 p-4 border border-neutral-700 bg-neutral-800 rounded-lg text-sm whitespace-pre-wrap">
+        <div class="mt-6 p-4 border border-neutral-700 bg-neutral-800 rounded-lg text-sm whitespace-pre-wrap break-words max-h-[300px] overflow-y-auto">
           <h2 class="font-semibold text-white mb-2">🧠 AI Insight Report</h2>
           <p class="text-gray-300">{report()}</p>
         </div>
