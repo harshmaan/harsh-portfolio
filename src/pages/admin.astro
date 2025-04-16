@@ -5,7 +5,14 @@ import BasicLayout from "../layouts/BasicLayout.astro";
 <BasicLayout title="Admin Panel" description="Welcome to your AI admin panel.">
   <main class="text-white flex flex-col items-center justify-center w-full h-screen gap-4">
     <h1 class="text-3xl font-bold">🛠️ Admin Panel</h1>
-    <p class="text-neutral-400">This is a placeholder for future AI-powered dashboard controls.</p>
+
+    <!-- 🔍 Persona Tracker Redirect Button -->
+    <a
+      href="/persona-tracker"
+      class="mt-2 inline-block px-4 py-2 border border-blue-500 text-blue-400 hover:text-white hover:bg-blue-600 rounded-lg text-sm transition"
+    >
+      🚀 Open Persona Tracker
+    </a>
 
     <form method="POST" action="/api/logout">
       <button
