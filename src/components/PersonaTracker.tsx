@@ -52,10 +52,12 @@ const PersonaTracker = () => {
           <For each={posts()}>
             {(post: any) => (
               <div class="border border-neutral-700 p-3 rounded bg-neutral-800">
-                <a href={`https://www.reddit.com${post.permalink}`} target="_blank" class="text-blue-400 hover:underline text-sm font-medium">
+                <a href={post.url} target="_blank" class="text-blue-400 hover:underline text-sm font-medium">
                   {post.title}
                 </a>
-                <p class="text-gray-400 text-xs mt-1">👍 {post.ups} | 💬 {post.num_comments} | 🧵 r/{post.subreddit}</p>
+                <p class="text-gray-400 text-xs mt-1">
+                  👍 {post.score} | 🧵 r/{post.subreddit}
+                </p>
               </div>
             )}
           </For>
