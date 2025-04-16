@@ -134,6 +134,7 @@ const JoinPage = () => {
 
     setPrompt("");
     setResponse("");
+    setMyResponse("");
     setScores({});
     setHasSubmitted(false);
     setRoundComplete(false);
