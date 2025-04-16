@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
-  const query = url.searchParams.get("name"); // changed from "query" to "name"
+  const query = url.searchParams.get("name"); // Should match the query param sent from frontend
 
   if (!query) {
     return new Response(
@@ -15,6 +15,16 @@ export const GET: APIRoute = async ({ request }) => {
 
   try {
     const res = await fetch(redditUrl);
+
+    // 👇 Add this to debug in Netlify logs
+    if (!res.ok) {
+      console.error("Reddit API failed", await res.text());
+      return new Response(
+        JSON.stringify({ error: "Reddit API returned error", status: res.status }),
+        { status: res.status }
+      );
+    }
+
     const data = await res.json();
 
     const posts = data?.data?.children?.map((child: any) => ({
@@ -30,9 +40,10 @@ export const GET: APIRoute = async ({ request }) => {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (err) {
+  } catch (err: any) {
+    console.error("Unexpected failure", err);
     return new Response(
-      JSON.stringify({ error: "Failed to fetch Reddit data", details: (err as Error).message }),
+      JSON.stringify({ error: "Failed to fetch Reddit data", details: err.message }),
       { status: 500 }
     );
   }
