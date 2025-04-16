@@ -2,6 +2,8 @@ import { createSignal, onMount, For, Show } from "solid-js";
 import { db } from "../lib/firebase";
 import { ref, set, onValue, update, remove } from "firebase/database";
 
+const [myResponse, setMyResponse] = createSignal("");
+
 const JoinPage = () => {
   const [name, setName] = createSignal("");
   const [sessionId, setSessionId] = createSignal("");
@@ -110,7 +112,7 @@ const JoinPage = () => {
   };
 
   const handleSubmit = async () => {
-    const responseVal = response();
+    const responseVal = myResponse();
     const playerPath = `sessions/${sessionId()}/players/${playerId()}`;
     await set(ref(db, `sessions/${sessionId()}/responses/${playerId()}`), responseVal);
     await update(ref(db, playerPath), { responded: true });
@@ -263,8 +265,8 @@ const JoinPage = () => {
               <textarea
                 class="w-full bg-neutral-800 border border-neutral-600 text-white rounded-lg p-3 min-h-[120px]"
                 placeholder="Write your response here..."
-                value={response()}
-                onInput={(e) => setResponse(e.currentTarget.value)}
+                value={myResponse()}
+                onInput={(e) => setMyResponse(e.currentTarget.value)}
                 disabled={hasSubmitted()}
               />
               <button
