@@ -272,7 +272,7 @@ const JoinPage = () => {
               <button
                 class="mt-4 bg-red-600 hover:bg-red-700 py-2 px-4 rounded-lg disabled:opacity-50"
                 onClick={handleSubmit}
-                disabled={hasSubmitted() || !response().trim()}
+                disabled={hasSubmitted() || !myResponse().trim()}
               >
                 {hasSubmitted() ? "✔️ Submitted" : "🚀 Submit Response"}
               </button>
