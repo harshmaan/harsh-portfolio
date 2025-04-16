@@ -157,29 +157,63 @@ const JoinPage = () => {
       </a>
 
       <Show when={!joined()}>
-        <div class="flex justify-center items-center min-h-[80vh]">
-          <div class="max-w-md w-full space-y-4 text-center">
+        <div class="flex justify-center items-center min-h-[90vh] px-4">
+          <div class="max-w-md w-full space-y-6 text-center">
             <h1 class="text-3xl font-bold">Enter the Arena</h1>
-            <input class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white" placeholder="Enter your name" value={name()} onInput={(e) => setName(e.currentTarget.value)} />
-            <input class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white" placeholder="Enter session ID" value={sessionId()} onInput={(e) => setSessionId(e.currentTarget.value)} />
-            <button
-              class="w-full bg-red-600 hover:bg-red-700 py-2 rounded disabled:opacity-50"
-              disabled={!name().trim() || !sessionId().trim()}
-              onClick={async () => {
-                console.log("Joining with name:", name(), "Session ID:", sessionId());
-                try {
-                  await handleJoin();
-                } catch (err) {
-                  console.error("Join failed:", err);
-                  alert("Something went wrong while joining. Please try again.");
-                }
-              }}
-            >
-              🚀 Join Game
-            </button>
+      
+            <div class="space-y-4">
+              <input
+                class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white"
+                placeholder="Enter your name"
+                value={name()}
+                onInput={(e) => setName(e.currentTarget.value)}
+              />
+              <input
+                class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded text-white"
+                placeholder="Enter session ID"
+                value={sessionId()}
+                onInput={(e) => setSessionId(e.currentTarget.value)}
+              />
+              <button
+                class="w-full bg-red-600 hover:bg-red-700 py-2 rounded disabled:opacity-50"
+                disabled={!name().trim() || !sessionId().trim()}
+                onClick={async () => {
+                  console.log("Joining with name:", name(), "Session ID:", sessionId());
+                  try {
+                    await handleJoin();
+                  } catch (err) {
+                    console.error("Join failed:", err);
+                    alert("Something went wrong while joining. Please try again.");
+                  }
+                }}
+              >
+                Join Game
+              </button>
+            </div>
+      
+            <div class="text-left mt-6 p-4 bg-neutral-900 border border-neutral-700 rounded space-y-4 text-sm leading-relaxed text-gray-300">
+              <div>
+                <h2 class="text-white font-semibold text-base">Concept</h2>
+                <p>
+                  Each team member gets a challenge like:  
+                  <em>“Convince a dragon to give you the treasure — but you can only use cooking metaphors.”</em><br />
+                  They submit their responses, and the LLM rates them on creativity, cleverness, or humor.
+                </p>
+              </div>
+      
+              <div>
+                <h2 class="text-white font-semibold text-base">Instructions</h2>
+                <ol class="list-decimal list-inside space-y-1">
+                  <li>The first player creates a session by entering their name and a custom session ID.</li>
+                  <li>Share the session ID with friends so they can join the same game.</li>
+                  <li>The first player to join becomes the host and can generate prompts and start new rounds.</li>
+                </ol>
+              </div>
+            </div>
           </div>
         </div>
       </Show>
+
 
 
       <Show when={joined()}>
