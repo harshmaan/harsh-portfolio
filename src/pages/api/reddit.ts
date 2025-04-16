@@ -16,7 +16,7 @@ export const GET: APIRoute = async ({ request }) => {
   try {
     const res = await fetch(redditUrl, {
       headers: {
-        "User-Agent": "persona-tracker/1.0 (by /u/harshmaan)" // Or any custom UA
+        "User-Agent": "persona-tracker-bot/1.0 by harshmaan.com"
       }
     });
   
