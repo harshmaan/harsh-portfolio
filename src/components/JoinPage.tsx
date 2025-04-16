@@ -49,10 +49,12 @@ const JoinPage = () => {
       const val = snapshot.val() || "";
       setPrompt(val);
     
-      // 🧼 Reset states for all players when host clears prompt
+      // ✅ Always reset for new prompt
+      setHasSubmitted(false);
+      setResponse("");
+    
+      // 🧼 Optional: clear scores if prompt is empty (initial state)
       if (!val) {
-        setHasSubmitted(false);
-        setResponse("");
         setScores({});
       }
     });
