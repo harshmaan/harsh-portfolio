@@ -183,7 +183,7 @@ const JoinPage = () => {
 
 
       <Show when={joined()}>
-        <div class="flex flex-col md:flex-row gap-6 mt-6 max-w-full">
+        <div class="flex flex-col md:flex-row gap-6 mt-14 max-w-full">
           <aside class="w-full md:w-1/4 bg-neutral-900 border border-neutral-700 rounded-xl p-4 space-y-3 text-white max-h-screen overflow-y-auto">
             <h2 class="text-lg font-semibold">🧑‍🤝‍🧑 Players</h2>
             <For each={players()}>
