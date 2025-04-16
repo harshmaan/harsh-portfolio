@@ -241,24 +241,55 @@ const JoinPage = () => {
             </Show>
 
             <Show when={roundComplete()}>
-              <div class="bg-neutral-800 border border-neutral-600 p-4 rounded-lg">
-                <p class="mb-2">🎉 <strong>{players().find(p => p.id === winnerId())?.name}</strong> won this round!</p>
-                <Show when={winnerId()}>
-                  <div class="mt-2 text-sm text-gray-300">
-                     📝 <strong>Winning Response:</strong>
-                     <br />
-                     <Show when={players().length}>
-                       {() => {
-                         const responseRef = ref(db, `sessions/${sessionId()}/responses/${winnerId()}`);
-                         onValue(responseRef, (snap) => {
-                           const val = snap.val();
-                           if (val) setResponse(val);
-                         });
-                         return <p class="mt-1 italic">{response()}</p>;
-                       }}
-                     </Show>
-                   </div>
-                </Show>
+              <div class="bg-neutral-800 border border-neutral-600 p-4 rounded-lg space-y-4">
+                <p class="text-lg font-semibold text-green-400">
+                  🎉 {players().find(p => p.id === winnerId())?.name} won this round!
+                </p>
+            
+                <div class="text-sm text-gray-300">
+                  <p class="font-semibold">📝 Winning Response:</p>
+                  <Show when={players().length}>
+                    {() => {
+                      const responseRef = ref(db, `sessions/${sessionId()}/responses/${winnerId()}`);
+                      onValue(responseRef, (snap) => {
+                        const val = snap.val();
+                        if (val) setResponse(val);
+                      });
+            
+                      const score = scores()[winnerId()] || 0;
+                      return (
+                        <p class="mt-1 italic">
+                          {response()} <span class="text-yellow-400 font-medium ml-2">({score} pts)</span>
+                        </p>
+                      );
+                    }}
+                  </Show>
+                </div>
+            
+                <div class="pt-2 border-t border-neutral-700">
+                  <h3 class="text-sm font-semibold mb-2">🗣️ All Player Responses</h3>
+                  <For each={players()}>
+                    {(player) => {
+                      const playerResponseRef = ref(db, `sessions/${sessionId()}/responses/${player.id}`);
+                      const [playerResponse, setPlayerResponse] = createSignal("");
+            
+                      onValue(playerResponseRef, (snap) => {
+                        const val = snap.val();
+                        if (val) setPlayerResponse(val);
+                      });
+            
+                      return (
+                        <div class="mb-2 text-sm">
+                          <span class="font-semibold">{player.name}:</span>{" "}
+                          <span class="italic text-gray-300">{playerResponse()}</span>
+                          <span class="text-yellow-400 font-medium ml-2">
+                            ({scores()[player.id] || 0} pts)
+                          </span>
+                        </div>
+                      );
+                    }}
+                  </For>
+                </div>
               </div>
             </Show>
           </section>
