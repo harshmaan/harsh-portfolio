@@ -1,2 +1,7 @@
 [functions]
 directory = "netlify/functions"
+
+[[headers]]
+  for = "/api/reddit"
+  [headers.values]
+    User-Agent = "persona-tracker-bot/1.0 by harshmaan.com"
