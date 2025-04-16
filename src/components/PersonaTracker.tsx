@@ -15,7 +15,7 @@ const PersonaTracker = () => {
     setReport("");
 
     try {
-      // Fetch Reddit posts
+      // 1️⃣ Fetch Reddit posts
       const res = await fetch(`https://www.reddit.com/search.json?q=${encodeURIComponent(cxoName())}&limit=10`, {
         headers: {
           "User-Agent": "Mozilla/5.0",
@@ -28,6 +28,7 @@ const PersonaTracker = () => {
 
       const cleaned = children.map((child: any) => ({
         title: child.data.title,
+        selftext: child.data.selftext || "", // ✅ Add selftext
         permalink: child.data.permalink,
         ups: child.data.ups,
         num_comments: child.data.num_comments,
@@ -36,13 +37,13 @@ const PersonaTracker = () => {
 
       setPosts(cleaned);
 
-      // Fetch persona report using Gemini
+      // 2️⃣ Fetch AI Insight Report
       const reportRes = await fetch("/api/persona-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: cxoName(),
-          posts: cleaned.map((p) => p.title), // You can add `selftext` if you want
+          posts: cleaned, // ✅ Full objects
         }),
       });
 
