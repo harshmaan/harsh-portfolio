@@ -289,7 +289,7 @@ const JoinPage = () => {
                       const responseRef = ref(db, `sessions/${sessionId()}/responses/${winnerId()}`);
                       onValue(responseRef, (snap) => {
                         const val = snap.val();
-                        if (val) setResponse(val);
+                        if (val) setResponse(typeof val === "string" ? val : "");
                       });
             
                       const score = scores()[winnerId()] || 0;
