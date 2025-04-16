@@ -2,6 +2,7 @@ import { createSignal, onMount, For, Show } from "solid-js";
 import { db } from "../lib/firebase";
 import { ref, set, onValue, update, remove } from "firebase/database";
 
+
 const [myResponse, setMyResponse] = createSignal("");
 
 const JoinPage = () => {
