@@ -12,11 +12,14 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   const redditUrl = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&limit=10`;
-
+  
   try {
-    const res = await fetch(redditUrl);
-
-    // 👇 Add this to debug in Netlify logs
+    const res = await fetch(redditUrl, {
+      headers: {
+        "User-Agent": "persona-tracker/1.0 (by /u/harshmaan)" // Or any custom UA
+      }
+    });
+  
     if (!res.ok) {
       console.error("Reddit API failed", await res.text());
       return new Response(
@@ -24,9 +27,8 @@ export const GET: APIRoute = async ({ request }) => {
         { status: res.status }
       );
     }
-
+  
     const data = await res.json();
-
     const posts = data?.data?.children?.map((child: any) => ({
       title: child.data.title,
       selftext: child.data.selftext,
@@ -35,7 +37,7 @@ export const GET: APIRoute = async ({ request }) => {
       subreddit: child.data.subreddit,
       created_utc: child.data.created_utc,
     })) || [];
-
+  
     return new Response(JSON.stringify({ posts }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
