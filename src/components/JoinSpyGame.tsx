@@ -124,13 +124,45 @@ const JoinSpyGame = () => {
 
       <Show when={joined()}>
         <h2 class="text-xl font-semibold mb-2">Welcome, {name()}!</h2>
-
+      
+        {/* 👥 Player Lobby List */}
+        <div class="mb-6 border border-neutral-700 p-4 rounded bg-neutral-800">
+          <h3 class="text-lg font-semibold mb-2">👥 Players in Lobby</h3>
+          <For each={players()}>
+            {(player) => (
+              <div class="text-sm text-gray-200 flex justify-between">
+                <span>{player.name}</span>
+                <span class="text-gray-500">{player.id === playerId() ? "(You)" : ""}</span>
+              </div>
+            )}
+          </For>
+        </div>
+      
+        {/* 🧑‍💼 Host sees Start Round button + waiting info */}
         <Show when={isHost()}>
-          <button onClick={generatePrompt} class="mb-4 bg-green-600 hover:bg-green-700 py-2 px-4 rounded">
+          <button
+            onClick={generatePrompt}
+            disabled={players().length < 4}
+            class="mb-4 bg-green-600 hover:bg-green-700 py-2 px-4 rounded disabled:opacity-50"
+          >
             🎭 Start Round
           </button>
+      
+          <Show when={players().length < 4}>
+            <p class="text-yellow-400 text-sm mt-2 animate-pulse">
+              ⏳ Need {4 - players().length} more player(s) to start...
+            </p>
+          </Show>
         </Show>
-
+      
+        {/* 🧍 Non-host waiting indicator */}
+        <Show when={!isHost() && players().length < 4}>
+          <div class="text-sm text-yellow-400 mb-4 animate-pulse">
+            ⏳ Waiting for host to start — {4 - players().length} more needed
+          </div>
+        </Show>
+      
+        {/* ✍️ Prompt + response section */}
         <Show when={personalPrompt()}>
           <p class="mb-4">📝 <strong>Your Prompt:</strong> {personalPrompt()}</p>
           <textarea
@@ -148,7 +180,8 @@ const JoinSpyGame = () => {
             {hasSubmitted() ? "✔️ Submitted" : "📤 Submit Response"}
           </button>
         </Show>
-
+      
+        {/* 🧾 Show all anonymous responses when all submitted */}
         <Show when={Object.keys(responses()).length === players().length}>
           <div class="mt-6">
             <h3 class="text-lg font-semibold mb-2">🧾 All Responses</h3>
@@ -169,7 +202,8 @@ const JoinSpyGame = () => {
             </For>
           </div>
         </Show>
-
+      
+        {/* ❌ Show elimination result */}
         <Show when={eliminated()}>
           <div class="mt-6 p-4 border border-red-600 bg-neutral-900 rounded">
             ❌ <strong>{players().find(p => p.id === eliminated())?.name}</strong> was eliminated!
