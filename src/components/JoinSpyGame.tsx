@@ -245,6 +245,17 @@ const JoinSpyGame = () => {
       <Show when={joined()}>
         <h2 class="text-xl font-semibold mb-2">Welcome, {name()}!</h2>
         <RoleBanner />
+        <Show when={role()}>
+        <span
+          class={`inline-block mb-4 px-3 py-1 rounded-full text-sm font-medium ${
+            role() === "Imposter"
+              ? "bg-red-700 text-red-100"
+              : "bg-green-700 text-green-100"
+          }`}
+        >
+          {role() === "Imposter" ? "😈 Imposter" : "🫶 Collaborator"}
+        </span>
+      </Show>
 
         {/* Players list */}
         <div class="mb-6 border border-neutral-700 p-4 rounded bg-neutral-800">
@@ -295,26 +306,37 @@ const JoinSpyGame = () => {
             ⏳ Waiting for host to start the match…
           </p>
         </Show>
-
-        {/* Personal prompt & submission */}
-        <Show when={personalPrompt() && winner() === null && !isDead() && !votingPhase()}>
+        
+        {/* ─── Prompt section ─── */}
+        <Show when={personalPrompt() && winner() === null && !votingPhase()}>
           <p class="mb-4">
             📝 <strong>Your Prompt:</strong> {personalPrompt()}
           </p>
-          <textarea
-            class="w-full bg-neutral-800 border border-neutral-600 p-2 rounded"
-            rows="5"
-            value={response()}
-            onInput={(e) => setResponse(e.currentTarget.value)}
-            disabled={hasSubmitted()}
-          />
-          <button
-            onClick={handleSubmitResponse}
-            disabled={hasSubmitted()}
-            class="mt-2 bg-red-600 hover:bg-red-700 py-2 px-4 rounded"
-          >
-            {hasSubmitted() ? "✔️ Submitted" : "📤 Submit Response"}
-          </button>
+        
+          {/* Alive players get the textarea */}
+          <Show when={!isDead()}>
+            <textarea
+              class="w-full bg-neutral-800 border border-neutral-600 p-2 rounded"
+              rows="5"
+              value={response()}
+              onInput={(e) => setResponse(e.currentTarget.value)}
+              disabled={hasSubmitted()}
+            />
+            <button
+              onClick={handleSubmitResponse}
+              disabled={hasSubmitted()}
+              class="mt-2 bg-red-600 hover:bg-red-700 py-2 px-4 rounded"
+            >
+              {hasSubmitted() ? "✔️ Submitted" : "📤 Submit Response"}
+            </button>
+          </Show>
+        
+          {/* Eliminated players just get a notice */}
+          <Show when={isDead()}>
+            <p class="mb-4 text-yellow-400 italic">
+              ❌ You’ve been eliminated. You are now spectating.
+            </p>
+          </Show>
         </Show>
 
         {isDead() && personalPrompt() && winner() === null && (
