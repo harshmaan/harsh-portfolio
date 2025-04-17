@@ -168,12 +168,12 @@ const JoinSpyGame = () => {
     /* check win conditions */
     const roleSnap = await get(ref(db, `${base()}/roles/${topId}`));
     const elimRole = roleSnap.val();
-    const remaining = alivePlayers().length - 1;
+    const remaining = alivePlayers().length;
 
     if (elimRole === "Imposter") {
       await set(ref(db, `${base()}/winner`), "Collaborators");
       await set(ref(db, `${base()}/gameOver`), true);
-    } else if (remaining <= 2) {
+    } else if (remaining === 2) { 
       await set(ref(db, `${base()}/winner`), "Imposter");
       await set(ref(db, `${base()}/gameOver`), true);
     } else if (isHost()) {
@@ -297,7 +297,7 @@ const JoinSpyGame = () => {
         </Show>
 
         {/* Personal prompt & submission */}
-        <Show when={personalPrompt() && winner() === null && !isDead()}>
+        <Show when={personalPrompt() && winner() === null && !isDead() && !votingPhase()}>
           <p class="mb-4">
             📝 <strong>Your Prompt:</strong> {personalPrompt()}
           </p>
