@@ -1,6 +1,42 @@
-import JoinSpyGame from './JoinSpyGame.tsx';
+---
 ---
 
-<Layout title="Spy Among Prompts">
-  <JoinSpyGame />
-</Layout>
+<html lang="en">
+  <body class="bg-black text-white p-6 flex flex-col items-center justify-center min-h-screen">
+    <h1 class="text-3xl font-bold mb-4">🕵️ Join Spy Among Prompts</h1>
+    <form
+      on:submit={(e) => {
+        e.preventDefault();
+        const name = e.target.name.value.trim();
+        const sessionId = e.target.sessionId.value.trim();
+
+        if (name && sessionId) {
+          localStorage.setItem("spyName", name); // 🔐 Store locally
+          window.location.href = `/spy/join?sessionId=${sessionId}`;
+        }
+      }}
+      class="flex flex-col gap-4 w-full max-w-md"
+    >
+      <input
+        type="text"
+        name="name"
+        placeholder="Your name"
+        class="p-3 rounded bg-neutral-800 border border-neutral-600 text-white"
+        required
+      />
+      <input
+        type="text"
+        name="sessionId"
+        placeholder="Session ID"
+        class="p-3 rounded bg-neutral-800 border border-neutral-600 text-white"
+        required
+      />
+      <button
+        type="submit"
+        class="bg-red-600 hover:bg-red-700 py-2 px-4 rounded"
+      >
+        🚀 Start Game
+      </button>
+    </form>
+  </body>
+</html>
