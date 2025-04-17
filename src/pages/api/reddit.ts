@@ -10,7 +10,7 @@ export const GET: APIRoute = async ({ request }) => {
     });
   }
 
-  const redditUrl = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&limit=10`;
+  const redditUrl = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&limit=100`;
 
   try {
     const res = await fetch(redditUrl, {
