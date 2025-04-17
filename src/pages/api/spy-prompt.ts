@@ -26,7 +26,7 @@ Generate two very easy‑to‑understand writing tasks about normal office life:
      audience, place, or tone).
 
 RULES  
-• Keep it workplace‑related: emails, meeting notes, memos, quick updates.  
+• Keep it workplace‑related: emails, meeting notes, quick updates.  
 • Use plain English, everyday words, no jargon or buzzwords.  
 • The twist should be subtle, not tricky.  
 • Output **exactly** like this (no extra lines):
