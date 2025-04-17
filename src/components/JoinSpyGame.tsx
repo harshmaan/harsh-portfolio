@@ -232,6 +232,23 @@ const JoinSpyGame = () => {
           </For>
         </div>
 
+        <Show
+          when={
+            isHost() &&
+            players().length >= 2 &&
+            !prompt() &&
+            !personalPrompt() &&
+            !gameOver()
+          }
+        >
+          <button
+            onClick={generatePrompt}
+            class="mb-4 bg-green-600 hover:bg-green-700 py-2 px-4 rounded"
+          >
+            🎭 Start Match
+          </button>
+        </Show>        
+
         <Show when={personalPrompt() && eliminated() !== playerId() && winner() === null}>
           <p class="mb-4">📝 <strong>Your Prompt:</strong> {personalPrompt()}</p>
           <textarea
