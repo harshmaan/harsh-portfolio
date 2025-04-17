@@ -270,7 +270,7 @@ const JoinSpyGame = () => {
             rows="5"
             value={response()}
             onInput={(e) => setResponse(e.currentTarget.value)}
-            disabled={hasSubmitted() || eliminated() === playerId()}
+            disabled={hasSubmitted()}
           />
           <button
             onClick={handleSubmitResponse}
