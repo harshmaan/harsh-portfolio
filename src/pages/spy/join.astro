@@ -1,0 +1,9 @@
+---
+// File: src/pages/spy/join.astro
+import BasicLayout from "../../layouts/BasicLayout.astro";
+import JoinSpyGame from "../../components/JoinSpyGame.tsx";
+---
+
+<BasicLayout title="Spy Among Prompts" description="Find the imposter hidden among you...">
+  <JoinSpyGame client:load />
+</BasicLayout>
