@@ -1,13 +1,8 @@
-// File: src/pages/spy/join.tsx
+// File: src/components/JoinSpyGame.tsx
+
 import { createSignal, Show, For } from "solid-js";
-import { db } from "../../lib/firebase";
-import {
-  ref,
-  set,
-  onValue,
-  update,
-  get,
-} from "firebase/database";
+import { db } from "../lib/firebase";
+import { ref, set, onValue } from "firebase/database";
 
 const JoinSpyGame = () => {
   const [name, setName] = createSignal("");
@@ -15,103 +10,112 @@ const JoinSpyGame = () => {
   const [joined, setJoined] = createSignal(false);
   const [playerId, setPlayerId] = createSignal("");
   const [players, setPlayers] = createSignal<any[]>([]);
-  const [hostId, setHostId] = createSignal("");
+  const [role, setRole] = createSignal<"Imposter" | "Collaborator" | null>(null);
+  const [prompt, setPrompt] = createSignal("");
+  const [personalPrompt, setPersonalPrompt] = createSignal("");
+  const [response, setResponse] = createSignal("");
+  const [hasSubmitted, setHasSubmitted] = createSignal(false);
+  const [responses, setResponses] = createSignal<Record<string, string>>({});
+  const [votingPhase, setVotingPhase] = createSignal(false);
+  const [votes, setVotes] = createSignal<Record<string, string>>({});
+  const [eliminated, setEliminated] = createSignal<string | null>(null);
 
-  const isHost = () => playerId() === hostId();
+  const isHost = () => players()[0]?.id === playerId();
 
   const handleJoin = async () => {
-    if (!name().trim() || !sessionId().trim()) return;
     const id = crypto.randomUUID();
     setPlayerId(id);
-
-    const sessionRef = ref(db, `spySessions/${sessionId()}`);
-    const sessionSnap = await get(sessionRef);
-    const isNewSession = !sessionSnap.exists();
-
-    await set(ref(db, `spySessions/${sessionId()}/players/${id}`), {
+    await set(ref(db, `spy/${sessionId()}/players/${id}`), {
       name: name(),
-      eliminated: false,
-      response: "",
-      vote: "",
       joinedAt: Date.now(),
     });
-
-    if (isNewSession) {
-      await update(sessionRef, {
-        hostId: id,
-        started: false,
-        round: 1,
-        responsesRevealed: false,
-        votingComplete: false,
-      });
-    }
-
     setJoined(true);
 
-    const playersRef = ref(db, `spySessions/${sessionId()}/players`);
-    onValue(playersRef, (snap) => {
-      const data = snap.val() || {};
-      const formatted = Object.entries(data).map(([id, val]: any) => ({
-        id,
-        ...val,
-      }));
-      setPlayers(formatted.sort((a, b) => a.joinedAt - b.joinedAt));
+    const playersRef = ref(db, `spy/${sessionId()}/players`);
+    onValue(playersRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      const sorted = Object.entries(data).sort((a, b) => a[1].joinedAt - b[1].joinedAt);
+      setPlayers(sorted.map(([id, val]: any) => ({ id, ...val })));
     });
 
-    const hostRef = ref(db, `spySessions/${sessionId()}/hostId`);
-    onValue(hostRef, (snap) => {
-      setHostId(snap.val());
+    const roleRef = ref(db, `spy/${sessionId()}/roles/${id}`);
+    onValue(roleRef, (snap) => {
+      if (snap.exists()) setRole(snap.val());
+    });
+
+    const personalPromptRef = ref(db, `spy/${sessionId()}/personalPrompts/${id}`);
+    onValue(personalPromptRef, (snap) => {
+      if (snap.exists()) setPersonalPrompt(snap.val());
+    });
+
+    const promptRef = ref(db, `spy/${sessionId()}/basePrompt`);
+    onValue(promptRef, (snap) => {
+      if (snap.exists()) setPrompt(snap.val());
+    });
+
+    const responsesRef = ref(db, `spy/${sessionId()}/responses`);
+    onValue(responsesRef, (snap) => {
+      setResponses(snap.val() || {});
+    });
+
+    const votesRef = ref(db, `spy/${sessionId()}/votes`);
+    onValue(votesRef, (snap) => {
+      setVotes(snap.val() || {});
+    });
+
+    const eliminatedRef = ref(db, `spy/${sessionId()}/eliminated`);
+    onValue(eliminatedRef, (snap) => {
+      if (snap.exists()) setEliminated(snap.val());
     });
   };
 
-  const handleStartGame = async () => {
-    const all = players();
-    const ids = all.map((p) => p.id);
-    const imposterId = ids[Math.floor(Math.random() * ids.length)];
+  const generatePrompt = async () => {
+    const res = await fetch("/api/spy-prompt");
+    const { basePrompt, imposterPrompt } = await res.json();
 
-    const updates: any = {};
-    ids.forEach((id) => {
-      updates[id] = {
-        ...all.find((p) => p.id === id),
-        role: id === imposterId ? "imposter" : "collaborator",
-        response: "",
-        vote: "",
-        eliminated: false,
-      };
-    });
+    await set(ref(db, `spy/${sessionId()}/basePrompt`), basePrompt);
 
-    await update(ref(db, `spySessions/${sessionId()}/players`), updates);
-    await update(ref(db, `spySessions/${sessionId()}`), {
-      started: true,
-      responsesRevealed: false,
-      votingComplete: false,
-    });
+    const imposterIndex = Math.floor(Math.random() * players().length);
+    await Promise.all(
+      players().map(async (player, idx) => {
+        const role = idx === imposterIndex ? "Imposter" : "Collaborator";
+        const promptToSend = idx === imposterIndex ? imposterPrompt : basePrompt;
 
-    window.location.href = `/spy/game?sessionId=${sessionId()}&playerId=${playerId()}`;
+        await set(ref(db, `spy/${sessionId()}/roles/${player.id}`), role);
+        await set(ref(db, `spy/${sessionId()}/personalPrompts/${player.id}`), promptToSend);
+      })
+    );
+  };
+
+  const handleSubmitResponse = async () => {
+    await set(ref(db, `spy/${sessionId()}/responses/${playerId()}`), response());
+    setHasSubmitted(true);
+  };
+
+  const handleVote = async (targetId: string) => {
+    await set(ref(db, `spy/${sessionId()}/votes/${playerId()}`), targetId);
   };
 
   return (
-    <main class="p-6 text-white max-w-xl mx-auto">
-      <h1 class="text-3xl font-bold text-center mb-6">🕵️ Spy Among Prompts</h1>
-
+    <main class="p-6 max-w-4xl mx-auto text-white">
       <Show when={!joined()}>
-        <div class="space-y-4">
+        <div class="space-y-4 text-center">
+          <h1 class="text-3xl font-bold">🕵️ Join Spy Among Prompts</h1>
           <input
-            class="w-full p-2 rounded bg-neutral-800 border border-neutral-600"
-            placeholder="Enter your name"
+            class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded"
+            placeholder="Name"
             value={name()}
             onInput={(e) => setName(e.currentTarget.value)}
           />
           <input
-            class="w-full p-2 rounded bg-neutral-800 border border-neutral-600"
+            class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded"
             placeholder="Session ID"
             value={sessionId()}
             onInput={(e) => setSessionId(e.currentTarget.value)}
           />
           <button
-            class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded"
-            disabled={!name().trim() || !sessionId().trim()}
             onClick={handleJoin}
+            class="bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded"
           >
             🚀 Join Game
           </button>
@@ -119,29 +123,57 @@ const JoinSpyGame = () => {
       </Show>
 
       <Show when={joined()}>
-        <h2 class="text-lg font-semibold mt-6">Players Joined:</h2>
-        <For each={players()}>
-          {(p) => (
-            <div class="flex justify-between py-1 border-b border-neutral-700 text-sm">
-              <span>{p.name}</span>
-              <span>{p.id === hostId() ? "👑 Host" : ""}</span>
-            </div>
-          )}
-        </For>
+        <h2 class="text-xl font-semibold mb-2">Welcome, {name()}!</h2>
 
-        <Show when={isHost() && players().length >= 4}>
-          <button
-            class="w-full mt-6 bg-green-600 hover:bg-green-700 py-2 rounded"
-            onClick={handleStartGame}
-          >
-            🎬 Start Game
+        <Show when={isHost()}>
+          <button onClick={generatePrompt} class="mb-4 bg-green-600 hover:bg-green-700 py-2 px-4 rounded">
+            🎭 Start Round
           </button>
         </Show>
 
-        <Show when={!isHost()}>
-          <p class="text-sm text-neutral-400 mt-4 italic text-center">
-            Waiting for host to start the game...
-          </p>
+        <Show when={personalPrompt()}>
+          <p class="mb-4">📝 <strong>Your Prompt:</strong> {personalPrompt()}</p>
+          <textarea
+            class="w-full bg-neutral-800 border border-neutral-600 p-2 rounded"
+            rows="5"
+            value={response()}
+            onInput={(e) => setResponse(e.currentTarget.value)}
+            disabled={hasSubmitted()}
+          />
+          <button
+            onClick={handleSubmitResponse}
+            disabled={hasSubmitted()}
+            class="mt-2 bg-red-600 hover:bg-red-700 py-2 px-4 rounded"
+          >
+            {hasSubmitted() ? "✔️ Submitted" : "📤 Submit Response"}
+          </button>
+        </Show>
+
+        <Show when={Object.keys(responses()).length === players().length}>
+          <div class="mt-6">
+            <h3 class="text-lg font-semibold mb-2">🧾 All Responses</h3>
+            <For each={Object.entries(responses())}>
+              {([id, resp]) => (
+                <div class="mb-2 p-2 border border-neutral-600 bg-neutral-800 rounded">
+                  <p class="text-sm italic">{resp}</p>
+                  <Show when={!votingPhase()}>
+                    <button
+                      class="mt-1 text-xs bg-yellow-500 hover:bg-yellow-600 px-2 py-1 rounded"
+                      onClick={() => handleVote(id)}
+                    >
+                      Vote to Eliminate
+                    </button>
+                  </Show>
+                </div>
+              )}
+            </For>
+          </div>
+        </Show>
+
+        <Show when={eliminated()}>
+          <div class="mt-6 p-4 border border-red-600 bg-neutral-900 rounded">
+            ❌ <strong>{players().find(p => p.id === eliminated())?.name}</strong> was eliminated!
+          </div>
         </Show>
       </Show>
     </main>
