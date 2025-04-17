@@ -75,6 +75,7 @@ const JoinSpyGame = () => {
       }, 2000); // delay for UX clarity
     }
   });
+};
 
 
   const generatePrompt = async () => {
