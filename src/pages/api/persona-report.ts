@@ -32,13 +32,13 @@ export const POST: APIRoute = async ({ request }) => {
       .join("\n\n");
 
     const prompt = `
-You are a professional reputation analysis AI. Based on the following Reddit posts about "${name}", generate a detailed executive-grade report with the following structure:
+You are a professional reputation analysis AI. Based on the following Reddit posts about "${name}", generate a detailed executive-grade report in **Markdown format** with the following structure:
 
 **📈 Reputation KPI Snapshot**  
-| KPI                            | Value                       |
+| KPI                           | Value                       |
 |-------------------------------|-----------------------------|
 | Sentiment Ratio               | 👍 X% / 😐 X% / 👎 X%        |
-| Avg. Engagement (Negative)    | X comments/upvotes          |
+| Avg. Engagement               | X comments/upvotes          |
 | Spike Event                   | <If any, e.g., date/topic>  |
 | Most Mentioned Brand Pillar   | <Pillar name> (X mentions)  |
 | Narrative Drift Score         | XX% alignment with official messaging  
@@ -77,6 +77,7 @@ Main contributors include <e.g., tech-savvy users / disgruntled employees / inve
 
 Reddit Posts:
 ${postTexts}
+Please format the entire response using **Markdown**.
 `.trim();
 
 
