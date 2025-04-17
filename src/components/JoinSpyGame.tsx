@@ -200,11 +200,11 @@ const JoinSpyGame = () => {
             {(player) => {
               const isSelf = player.id === playerId();
               const hasPrompt = !!personalPrompt();
-              const playerRole =
-                hasPrompt && player.id === playerId()
-                  ? role()
+              const playerRoleDisplay =
+                isSelf && role()
+                  ? `— ${role()}`
                   : hasPrompt
-                  ? "❓"
+                  ? "— Role Hidden"
                   : null;
               const hasResponded = hasPrompt && responses()[player.id];
 
@@ -213,13 +213,9 @@ const JoinSpyGame = () => {
                   <div>
                     {player.name}
                     {isSelf && " (You)"}
-                    {playerRole && (
+                    {playerRoleDisplay && (
                       <span class="text-xs text-gray-400 italic ml-1">
-                        {player.id === playerId()
-                          ? playerRole === "Imposter"
-                            ? "— Imposter"
-                            : "— Collaborator"
-                          : "— Role Hidden"}
+                        {playerRoleDisplay}
                       </span>
                     )}
                   </div>
