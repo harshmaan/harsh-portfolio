@@ -32,41 +32,53 @@ export const POST: APIRoute = async ({ request }) => {
       .join("\n\n");
 
     const prompt = `
-You are a professional reputation analysis AI. Based on the following Reddit posts about "${name}", generate a clearly structured and readable report with the following five sections:
+You are a professional reputation analysis AI. Based on the following Reddit posts about "${name}", generate a detailed executive-grade report with the following structure:
 
-1. **Sentiment Breakdown** (Count of Positive / Neutral / Negative posts)
-2. **Public Narrative Summary** (Brief 2–3 line summary of public perception)
-3. **Messaging Alignment** (How aligned are the posts with the official messaging or brand image?)
-4. **Top Concerns / Repeated Topics** (Bullet points)
-5. **Recommendations to Improve Public Perception** (Numbered list, actionable)
+**📈 Reputation KPI Snapshot**  
+| KPI                            | Value                       |
+|-------------------------------|-----------------------------|
+| Sentiment Ratio               | 👍 X% / 😐 X% / 👎 X%        |
+| Avg. Engagement (Negative)    | X comments/upvotes          |
+| Spike Event                   | <If any, e.g., date/topic>  |
+| Most Mentioned Brand Pillar   | <Pillar name> (X mentions)  |
+| Narrative Drift Score         | XX% alignment with official messaging  
+| Most Viral Post Sentiment     | <Positive / Neutral / Negative>
 
-Use this format exactly:
 
----
 **Sentiment Breakdown:**
-Positive: X  
-Neutral: X  
-Negative: X
+Positive: X (X%)  
+Neutral: X (X%)  
+Negative: X (X%)  
+↳ Trend Analysis: <Brief 1-liner about sentiment shift, if any>
 
 **Public Narrative Summary:**
-<summary>
+<Tone, dominant perception, and a quote if applicable>
 
 **Messaging Alignment:**
-<alignment analysis>
+✔ Core Message Echoed:  
+✘ Message Misses:  
 
-**Top Concerns / Topics:**
-- Concern 1
-- Concern 2
+**Top Concerns / Topics (with frequency):**
+- <Theme> — X posts
+- <Theme> — X posts
 
-**Recommendations:**
-1. Suggestion 1
-2. Suggestion 2
-3. Suggestion 3
----
+**Audience Insight (optional if detectable):**
+Main contributors include <e.g., tech-savvy users / disgruntled employees / investors>
+
+**Recommendations to Improve Public Perception:**
+
+*Short-Term Actions:*  
+1. <PR / Comms suggestion>  
+2. <Social media or influencer engagement idea>  
+
+*Long-Term Strategy:*  
+3. <Product, CX, or cultural initiative>  
+4. <Thought leadership or innovation comms idea>  
 
 Reddit Posts:
 ${postTexts}
 `.trim();
+
 
     console.log("🧠 Gemini Prompt:", prompt); // helpful for debugging in logs
 
