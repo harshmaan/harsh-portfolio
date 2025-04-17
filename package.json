@@ -35,7 +35,8 @@
     "svelte": "^5.25.3",
     "solid-js": "^1.9.5",
     "@solidjs/router": "^0.15.3",
-    "firebase": "^10.7.1"
+    "firebase": "^10.7.1",
+    "marked": "^10.0.0"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",
