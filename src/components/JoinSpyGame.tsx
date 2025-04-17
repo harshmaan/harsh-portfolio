@@ -236,7 +236,7 @@ const JoinSpyGame = () => {
           </For>
         </div>
 
-        <Show when={personalPrompt() && eliminated() !== playerId()}>
+        <Show when={personalPrompt() && eliminated() !== playerId() && winner() === null}>
           <p class="mb-4">📝 <strong>Your Prompt:</strong> {personalPrompt()}</p>
           <textarea
             class="w-full bg-neutral-800 border border-neutral-600 p-2 rounded"
@@ -261,13 +261,16 @@ const JoinSpyGame = () => {
               {([id, resp]) => (
                 <div class="mb-2 p-2 border border-neutral-600 bg-neutral-800 rounded">
                   <p class="text-sm italic">{resp}</p>
-                  <Show when={votingPhase() && !votes()[playerId()] && eliminated() !== playerId()}>
+                  <Show when={votingPhase() && !votes()[playerId()] && eliminated() !== playerId() && winner() === null}>
                     <button
                       class="mt-1 text-xs bg-yellow-500 hover:bg-yellow-600 px-2 py-1 rounded"
                       onClick={() => handleVote(id)}
                     >
                       Vote to Eliminate
                     </button>
+                  </Show>
+                  <Show when={eliminated() === playerId() && votingPhase()}>
+                  <p class="text-xs italic text-yellow-400 mt-1">You’ve been eliminated. Viewing only.</p>
                   </Show>
                 </div>
               )}
