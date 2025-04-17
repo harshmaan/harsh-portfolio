@@ -70,6 +70,21 @@ const JoinSpyGame = () => {
       if (snap.exists()) setWinner(snap.val());
     });
 
+    // 🔄 NEW: Listen for round reset trigger
+    onValue(ref(db, `spy/${sessionId()}/roundId`), (snap) => {
+      if (!snap.exists()) return;
+      setVotingPhase(false);
+      setHasSubmitted(false);
+      setPrompt("");
+      setPersonalPrompt("");
+      setResponse("");
+      setEliminated(null);
+      setGameOver(false);
+      setWinner(null);
+      setResponses({});
+      setVotes({});
+    });
+
     onValue(ref(db, `spy/${sessionId()}/eliminated`), async (snap) => {
       if (!snap.exists()) return;
       const eliminatedId = snap.val();
@@ -122,14 +137,9 @@ const JoinSpyGame = () => {
       remove(ref(db, `${base}/gameOver`)),
       remove(ref(db, `${base}/winner`)),
     ]);
-    setVotingPhase(false);
-    setHasSubmitted(false);
-    setPrompt("");
-    setPersonalPrompt("");
-    setResponse("");
-    setEliminated(null);
-    setGameOver(false);
-    setWinner(null);
+
+    // 🔄 NEW: Signal reset to all clients
+    await set(ref(db, `${base}/roundId`), crypto.randomUUID());
   };
 
   const tallyVotesAndEliminate = async () => {
