@@ -129,14 +129,47 @@ const JoinSpyGame = () => {
         <div class="mb-6 border border-neutral-700 p-4 rounded bg-neutral-800">
           <h3 class="text-lg font-semibold mb-2">👥 Players in Lobby</h3>
           <For each={players()}>
-            {(player) => (
-              <div class="text-sm text-gray-200 flex justify-between">
-                <span>{player.name}</span>
-                <span class="text-gray-500">{player.id === playerId() ? "(You)" : ""}</span>
-              </div>
-            )}
+            {(player) => {
+              const isSelf = player.id === playerId();
+              const hasPrompt = !!personalPrompt();
+              const playerRole =
+                hasPrompt && player.id === playerId()
+                  ? role()
+                  : hasPrompt
+                  ? "❓"
+                  : null;
+              const hasResponded = hasPrompt && responses()[player.id];
+        
+              return (
+                <div class="text-sm text-gray-200 flex justify-between items-center mb-1">
+                  <div>
+                    {player.name}
+                    {isSelf && " (You)"}
+                    {playerRole && (
+                      <span class="text-xs text-gray-400 italic ml-1">
+                        {player.id === playerId()
+                          ? playerRole === "Imposter"
+                            ? "— Imposter"
+                            : "— Collaborator"
+                          : "— Role Hidden"}
+                      </span>
+                    )}
+                  </div>
+                  {hasPrompt && (
+                    <span
+                      class={`text-xs font-medium ${
+                        hasResponded ? "text-green-400" : "text-yellow-400 animate-pulse"
+                      }`}
+                    >
+                      {hasResponded ? "✅ Responded" : "⌛ Waiting"}
+                    </span>
+                  )}
+                </div>
+              );
+            }}
           </For>
         </div>
+
       
         {/* 🧑‍💼 Host sees Start Round button + waiting info */}
         <Show when={isHost()}>
