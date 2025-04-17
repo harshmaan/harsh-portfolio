@@ -1,0 +1,20 @@
+---
+import { getCurrentTimeInItaly, formatTimeForItaly } from "../lib/helpers";
+import Card from "./Card/index.astro";
+---
+
+<Card colSpan="lg:col-span-2" rowSpan="md:row-span-2" title="ReputAI – Your CXO's Narrative, decoded by AI.">
+  <div class="h-[calc(100%-28px)] flex flex-col justify-center items-center text-center px-4 space-y-4">
+    <p class="text-sm text-gray-300">
+      ReputAI analyzes Reddit conversations to decode public perception of CXOs using AI.
+    </p>
+
+    <!-- 🔍 Persona Tracker Redirect Button -->
+    <a
+      href="/persona-tracker"
+      class="inline-block px-4 py-2 border border-blue-500 text-blue-400 hover:text-white hover:bg-blue-600 rounded-lg text-sm transition"
+    >
+      🚀 Open Persona Tracker
+    </a>
+  </div>
+</Card>
