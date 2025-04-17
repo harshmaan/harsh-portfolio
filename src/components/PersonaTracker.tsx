@@ -59,7 +59,8 @@ import { createSignal, Show, For } from "solid-js";
  
    return (
      <div class="max-w-7xl mx-auto w-full p-6 bg-neutral-900 rounded-lg border border-neutral-700 text-white">
-       <h1 class="text-2xl font-bold mb-4 text-center">📣 Persona Tracker</h1>
+       <h1 class="text-2xl font-bold mb-4 text-center">ReputAI</h1>
+       <h2 class="text-xl font-bold mb-4 text-center">Track public perception. Instantly.</h2>
  
        <div class="flex justify-center gap-2 mb-4">
          <input
