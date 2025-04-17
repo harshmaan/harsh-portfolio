@@ -247,7 +247,21 @@ const JoinSpyGame = () => {
           >
             🎭 Start Match
           </button>
-        </Show>        
+        </Show>  
+
+        <Show
+          when={
+            !isHost() &&
+            players().length >= 2 &&
+            !prompt() &&
+            !personalPrompt() &&
+            !gameOver()
+          }
+        >
+          <div class="text-sm text-yellow-400 text-center mb-4">
+            ⏳ Waiting for host to start the match…
+          </div>
+        </Show>      
 
         <Show when={personalPrompt() && eliminated() !== playerId() && winner() === null}>
           <p class="mb-4">📝 <strong>Your Prompt:</strong> {personalPrompt()}</p>
