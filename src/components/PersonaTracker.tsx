@@ -67,7 +67,7 @@ import { createSignal, Show, For } from "solid-js";
            placeholder="Enter CXO name (e.g. Julie Sweet)"
            value={cxoName()}
            onInput={(e) => setCxoName(e.currentTarget.value)}
-           class="flex-1 px-4 py-2 rounded bg-neutral-800 border border-neutral-600 text-white"
+           class="w-full md:w-1/2 px-4 py-2 rounded bg-neutral-800 border border-neutral-600 text-white"
          />
          <button
            onClick={handleSearch}
