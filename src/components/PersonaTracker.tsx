@@ -58,7 +58,7 @@ import { createSignal, Show, For } from "solid-js";
    };
  
    return (
-     <div class="max-w-xl mx-auto w-full p-6 bg-neutral-900 rounded-lg border border-neutral-700 text-white">
+     <div class="max-w-7xl mx-auto w-full p-6 bg-neutral-900 rounded-lg border border-neutral-700 text-white">
        <h1 class="text-2xl font-bold mb-4 text-center">📣 Persona Tracker</h1>
  
        <div class="flex items-center gap-2 mb-4">
@@ -82,31 +82,37 @@ import { createSignal, Show, For } from "solid-js";
          <p class="text-red-500 text-sm mb-2">{error()}</p>
        </Show>
  
-       <Show when={posts().length > 0}>
-         <div class="space-y-3 mt-4 max-h-[400px] overflow-y-auto">
-           <For each={posts()}>
-             {(post: any) => (
-               <div class="border border-neutral-700 p-3 rounded bg-neutral-800">
-                 <a
-                   href={`https://www.reddit.com${post.permalink}`}
-                   target="_blank"
-                   class="text-blue-400 hover:underline text-sm font-medium"
-                 >
-                   {post.title}
-                 </a>
-                 <p class="text-gray-400 text-xs mt-1">
-                   👍 {post.ups} | 💬 {post.num_comments} | 🧵 r/{post.subreddit}
-                 </p>
-               </div>
-             )}
-           </For>
-         </div>
-       </Show>
- 
-       <Show when={report()}>
-         <div class="mt-6 p-4 border border-neutral-700 bg-neutral-800 rounded-lg text-sm whitespace-pre-wrap break-words max-h-[300px] overflow-y-auto">
-           <h2 class="font-semibold text-white mb-2">🧠 AI Insight Report</h2>
-           <p class="text-gray-300">{report()}</p>
+       <Show when={posts().length > 0 || report()}>
+         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+           {/* Reddit Posts */}
+           <Show when={posts().length > 0}>
+             <div class="space-y-3 max-h-[400px] overflow-y-auto">
+               <For each={posts()}>
+                 {(post: any) => (
+                   <div class="border border-neutral-700 p-3 rounded bg-neutral-800">
+                     <a
+                       href={`https://www.reddit.com${post.permalink}`}
+                       target="_blank"
+                       class="text-blue-400 hover:underline text-sm font-medium"
+                     >
+                       {post.title}
+                     </a>
+                     <p class="text-gray-400 text-xs mt-1">
+                       👍 {post.ups} | 💬 {post.num_comments} | 🧵 r/{post.subreddit}
+                     </p>
+                   </div>
+                 )}
+               </For>
+             </div>
+           </Show>
+       
+           {/* AI Report */}
+           <Show when={report()}>
+             <div class="p-4 border border-neutral-700 bg-neutral-800 rounded-lg text-sm whitespace-pre-wrap break-words max-h-[400px] overflow-y-auto">
+               <h2 class="font-semibold text-white mb-2">🧠 AI Insight Report</h2>
+               <p class="text-gray-300">{report()}</p>
+             </div>
+           </Show>
          </div>
        </Show>
      </div>
