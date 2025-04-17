@@ -62,6 +62,14 @@ const JoinSpyGame = () => {
       setVotes(snap.val() || {});
     });
 
+    onValue(ref(db, `spy/${sessionId()}/gameOver`), (snap) => {
+      if (snap.exists()) setGameOver(snap.val());
+    });
+    
+    onValue(ref(db, `spy/${sessionId()}/winner`), (snap) => {
+      if (snap.exists()) setWinner(snap.val());
+    });
+
     onValue(ref(db, `spy/${sessionId()}/eliminated`), async (snap) => {
     if (!snap.exists()) return;
     const eliminatedId = snap.val();
@@ -113,6 +121,8 @@ const JoinSpyGame = () => {
       remove(ref(db, `${base}/responses`)),
       remove(ref(db, `${base}/votes`)),
       remove(ref(db, `${base}/eliminated`)),
+      remove(ref(db, `${base}/gameOver`)),
+      remove(ref(db, `${base}/winner`)),
     ]);
     setVotingPhase(false);
     setHasSubmitted(false);
@@ -139,13 +149,13 @@ const JoinSpyGame = () => {
       if (!snap.exists()) return;
       const eliminatedRole = snap.val();
       if (eliminatedRole === "Imposter") {
-        setWinner("Collaborators");
-        setGameOver(true);
+        await set(ref(db, `spy/${sessionId()}/winner`), "Collaborators");
+        await set(ref(db, `spy/${sessionId()}/gameOver`), true);
       } else {
         const remaining = players().length - 1;
         if (remaining <= 2) {
-          setWinner("Imposter");
-          setGameOver(true);
+          await set(ref(db, `spy/${sessionId()}/winner`), "Imposter");
+          await set(ref(db, `spy/${sessionId()}/gameOver`), true);
         }
       }
     }, { onlyOnce: true });
