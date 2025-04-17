@@ -263,23 +263,30 @@ const JoinSpyGame = () => {
           </div>
         </Show>      
 
-        <Show when={personalPrompt() && eliminated() !== playerId() && winner() === null}>
-          <p class="mb-4">📝 <strong>Your Prompt:</strong> {personalPrompt()}</p>
-          <textarea
-            class="w-full bg-neutral-800 border border-neutral-600 p-2 rounded"
-            rows="5"
-            value={response()}
-            onInput={(e) => setResponse(e.currentTarget.value)}
-            disabled={hasSubmitted()}
-          />
-          <button
-            onClick={handleSubmitResponse}
-            disabled={hasSubmitted() || eliminated() === playerId()}
-            class="mt-2 bg-red-600 hover:bg-red-700 py-2 px-4 rounded"
-          >
-            {hasSubmitted() ? "✔️ Submitted" : "📤 Submit Response"}
-          </button>
+        <Show when={personalPrompt() && winner() === null}>
+          <Show when={eliminated() === playerId()}>
+            <p class="mb-4 text-yellow-400 italic">❌ You’ve been eliminated. You cannot submit a response this round.</p>
+          </Show>
+        
+          <Show when={eliminated() !== playerId()}>
+            <p class="mb-4">📝 <strong>Your Prompt:</strong> {personalPrompt()}</p>
+            <textarea
+              class="w-full bg-neutral-800 border border-neutral-600 p-2 rounded"
+              rows="5"
+              value={response()}
+              onInput={(e) => setResponse(e.currentTarget.value)}
+              disabled={hasSubmitted()}
+            />
+            <button
+              onClick={handleSubmitResponse}
+              disabled={hasSubmitted()}
+              class="mt-2 bg-red-600 hover:bg-red-700 py-2 px-4 rounded"
+            >
+              {hasSubmitted() ? "✔️ Submitted" : "📤 Submit Response"}
+            </button>
+          </Show>
         </Show>
+
 
         <Show when={Object.keys(responses()).length === players().length}>
           <div class="mt-6">
