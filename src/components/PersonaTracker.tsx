@@ -66,7 +66,7 @@ import { marked } from "marked";
        <div class="flex justify-center gap-2 mb-4">
          <input
            type="text"
-           placeholder="Enter CXO name (e.g. Julie Sweet)"
+           placeholder="Enter CXO and Company name (e.g. Satya Nadella Microsoft)"
            value={cxoName()}
            onInput={(e) => setCxoName(e.currentTarget.value)}
            class="w-full md:w-1/2 px-4 py-2 rounded bg-neutral-800 border border-neutral-600 text-white"
