@@ -65,26 +65,24 @@ const JoinSpyGame = () => {
     onValue(ref(db, `spy/${sessionId()}/gameOver`), (snap) => {
       if (snap.exists()) setGameOver(snap.val());
     });
-    
+
     onValue(ref(db, `spy/${sessionId()}/winner`), (snap) => {
       if (snap.exists()) setWinner(snap.val());
     });
 
     onValue(ref(db, `spy/${sessionId()}/eliminated`), async (snap) => {
-    if (!snap.exists()) return;
-    const eliminatedId = snap.val();
-    setEliminated(eliminatedId);
-  
-    // Only host triggers next round if game not over
-    if (isHost() && !gameOver()) {
-      setTimeout(async () => {
-        await startNextRound();
-        await generatePrompt();
-      }, 2000); // delay for UX clarity
-    }
-  });
-};
+      if (!snap.exists()) return;
+      const eliminatedId = snap.val();
+      setEliminated(eliminatedId);
 
+      if (isHost() && !gameOver()) {
+        setTimeout(async () => {
+          await startNextRound();
+          await generatePrompt();
+        }, 2000);
+      }
+    });
+  };
 
   const generatePrompt = async () => {
     const res = await fetch("/api/spy-prompt");
@@ -147,17 +145,20 @@ const JoinSpyGame = () => {
     const roleRef = ref(db, `spy/${sessionId()}/roles/${topPlayerId}`);
     onValue(roleRef, (snap) => {
       if (!snap.exists()) return;
-      const eliminatedRole = snap.val();
-      if (eliminatedRole === "Imposter") {
-        await set(ref(db, `spy/${sessionId()}/winner`), "Collaborators");
-        await set(ref(db, `spy/${sessionId()}/gameOver`), true);
-      } else {
-        const remaining = players().length - 1;
-        if (remaining <= 2) {
-          await set(ref(db, `spy/${sessionId()}/winner`), "Imposter");
+
+      (async () => {
+        const eliminatedRole = snap.val();
+        if (eliminatedRole === "Imposter") {
+          await set(ref(db, `spy/${sessionId()}/winner`), "Collaborators");
           await set(ref(db, `spy/${sessionId()}/gameOver`), true);
+        } else {
+          const remaining = players().length - 1;
+          if (remaining <= 2) {
+            await set(ref(db, `spy/${sessionId()}/winner`), "Imposter");
+            await set(ref(db, `spy/${sessionId()}/gameOver`), true);
+          }
         }
-      }
+      })();
     }, { onlyOnce: true });
   };
 
@@ -304,4 +305,3 @@ const JoinSpyGame = () => {
 };
 
 export default JoinSpyGame;
-  
