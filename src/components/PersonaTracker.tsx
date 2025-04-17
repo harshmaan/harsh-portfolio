@@ -109,7 +109,7 @@ import { createSignal, Show, For } from "solid-js";
            {/* AI Report */}
            <Show when={report()}>
              <div class="p-4 border border-neutral-700 bg-neutral-800 rounded-lg text-sm whitespace-pre-wrap break-words max-h-[400px] overflow-y-auto">
-               <h2 class="font-bold text-white text-lg text-center mb-2">
+               <h2 class="font-bold text-white text-lg text-center mb-2">🧠 AI Insight Report</h2>
                <p class="text-gray-300">{report()}</p>
              </div>
            </Show>
