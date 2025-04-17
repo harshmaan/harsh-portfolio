@@ -62,10 +62,20 @@ const JoinSpyGame = () => {
       setVotes(snap.val() || {});
     });
 
-    onValue(ref(db, `spy/${sessionId()}/eliminated`), (snap) => {
-      if (snap.exists()) setEliminated(snap.val());
-    });
-  };
+    onValue(ref(db, `spy/${sessionId()}/eliminated`), async (snap) => {
+    if (!snap.exists()) return;
+    const eliminatedId = snap.val();
+    setEliminated(eliminatedId);
+  
+    // Only host triggers next round if game not over
+    if (isHost() && !gameOver()) {
+      setTimeout(async () => {
+        await startNextRound();
+        await generatePrompt();
+      }, 2000); // delay for UX clarity
+    }
+  });
+
 
   const generatePrompt = async () => {
     const res = await fetch("/api/spy-prompt");
@@ -214,18 +224,18 @@ const JoinSpyGame = () => {
           </button>
         </Show>
 
-        <Show when={personalPrompt()}>
+        <Show when={personalPrompt() && eliminated() !== playerId()}>
           <p class="mb-4">📝 <strong>Your Prompt:</strong> {personalPrompt()}</p>
           <textarea
             class="w-full bg-neutral-800 border border-neutral-600 p-2 rounded"
             rows="5"
             value={response()}
             onInput={(e) => setResponse(e.currentTarget.value)}
-            disabled={hasSubmitted()}
+            disabled={hasSubmitted() || eliminated() === playerId()}
           />
           <button
             onClick={handleSubmitResponse}
-            disabled={hasSubmitted()}
+            disabled={hasSubmitted() || eliminated() === playerId()}
             class="mt-2 bg-red-600 hover:bg-red-700 py-2 px-4 rounded"
           >
             {hasSubmitted() ? "✔️ Submitted" : "📤 Submit Response"}
@@ -239,7 +249,7 @@ const JoinSpyGame = () => {
               {([id, resp]) => (
                 <div class="mb-2 p-2 border border-neutral-600 bg-neutral-800 rounded">
                   <p class="text-sm italic">{resp}</p>
-                  <Show when={votingPhase() && !votes()[playerId()]}>
+                  <Show when={votingPhase() && !votes()[playerId()] && eliminated() !== playerId()}>
                     <button
                       class="mt-1 text-xs bg-yellow-500 hover:bg-yellow-600 px-2 py-1 rounded"
                       onClick={() => handleVote(id)}
@@ -283,3 +293,4 @@ const JoinSpyGame = () => {
 };
 
 export default JoinSpyGame;
+  
