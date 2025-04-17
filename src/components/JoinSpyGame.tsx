@@ -244,7 +244,6 @@ const JoinSpyGame = () => {
       {/* ───── In‑Game View ───── */}
       <Show when={joined()}>
         <h2 class="text-xl font-semibold mb-2">Welcome, {name()}!</h2>
-        <RoleBanner />
         <Show when={role()}>
         <span
           class={`inline-block mb-4 px-3 py-1 rounded-full text-sm font-medium ${
