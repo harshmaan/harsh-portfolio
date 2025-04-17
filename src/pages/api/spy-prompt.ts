@@ -14,25 +14,31 @@ export const GET: APIRoute = async () => {
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
+  /* --- src/pages/api/spy‑prompt.ts -------------------------------------- */
   const prompt = `
-You're a game master for a social deduction game called "Spy Among Prompts".
+You are the friendly game‑master for **“Spy Among Prompts.”**
 
-Your task is to:
-1. Generate a clear, simple base writing prompt.
-2. Generate a subtle variation for an Imposter that changes the audience, tone, or context slightly.
+GOAL  
+Generate two very easy‑to‑understand writing tasks about normal office life:
 
-Format your response exactly like this:
+  1. **BASE PROMPT** – one simple, clear sentence (≤ 12 words).  
+  2. **IMPOSTER PROMPT** – same topic, but with a tiny twist (different
+     audience, place, or tone).
+
+RULES  
+• Keep it workplace‑related: emails, meeting notes, memos, quick updates.  
+• Use plain English, everyday words, no jargon or buzzwords.  
+• The twist should be subtle, not tricky.  
+• Output **exactly** like this (no extra lines):
 
 BASE PROMPT: <base prompt>
-IMPOSTER PROMPT: <slightly different version of the base prompt>
+IMPOSTER PROMPT: <imposter prompt>
 
-The base prompt should be serious and work-related (e.g., emails, memos, updates, etc.).
-
-Example:
+Example  
 BASE PROMPT: Write a message about budget cuts.
 IMPOSTER PROMPT: Write an internal team message about budget cuts.
 
-Now generate a fresh pair.
+Now give one fresh pair.
 `.trim();
 
   try {
