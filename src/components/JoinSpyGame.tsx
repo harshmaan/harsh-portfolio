@@ -143,9 +143,10 @@ const JoinSpyGame = () => {
   const startNewMatch = async () => {
     await startNextRound();
     await Promise.all([
-      remove(ref(db, `${base()}/winner`)),
-      remove(ref(db, `${base()}/gameOver`)),
-      remove(ref(db, `${base()}/dead`)), // everyone alive again
+      set(ref(db, `${base()}/winner`),     null), 
+      set(ref(db, `${base()}/gameOver`),   false),
+      set(ref(db, `${base()}/eliminated`), null),
+      remove(ref(db, `${base()}/dead`)), 
     ]);
     await set(ref(db, `${base()}/matchId`), crypto.randomUUID());
   };
