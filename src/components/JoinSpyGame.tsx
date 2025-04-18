@@ -79,8 +79,8 @@ const JoinSpyGame = () => {
     });
     onValue(ref(db, `${base()}/votes`),       s => setVotes(s.val() || {}));
     onValue(ref(db, `${base()}/eliminated`),  s => s.exists() && setEliminated(s.val()));
-    onValue(ref(db, `${base()}/gameOver`),    s => s.exists() && setGameOver(s.val()));
-    onValue(ref(db, `${base()}/winner`),      s => s.exists() && setWinner(s.val()));
+    onValue(ref(db, `${base()}/gameOver`),    s => setGameOver(s.exists() ? s.val() : false));
+    onValue(ref(db, `${base()}/winner`),      s => setWinner(s.exists() ? s.val() : null));
 
     /* resets */
     onValue(ref(db, `${base()}/roundId`), s => s.exists() && resetRoundLocal());
