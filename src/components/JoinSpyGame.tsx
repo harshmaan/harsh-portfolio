@@ -78,7 +78,7 @@ const JoinSpyGame = () => {
       if (Object.keys(data).length === alivePlayers().length) setVotingPhase(true);
     });
     onValue(ref(db, `${base()}/votes`),       s => setVotes(s.val() || {}));
-    onValue(ref(db, `${base()}/eliminated`),  s => s.exists() && setEliminated(s.val()));
+    onValue(ref(db, `${base()}/eliminated`),  s => setEliminated(s.exists() ? s.val() : null));
     onValue(ref(db, `${base()}/gameOver`),    s => setGameOver(s.exists() ? s.val() : false));
     onValue(ref(db, `${base()}/winner`),      s => setWinner(s.exists() ? s.val() : null));
 
