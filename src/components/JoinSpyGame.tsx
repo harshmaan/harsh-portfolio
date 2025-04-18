@@ -84,7 +84,17 @@ const JoinSpyGame = () => {
 
     /* resets */
     onValue(ref(db, `${base()}/roundId`), s => s.exists() && resetRoundLocal());
-    onValue(ref(db, `${base()}/matchId`), s => s.exists() && resetMatchLocal());
+    onValue(ref(db, `${base()}/matchId`), s => {
+      if (!s.exists()) return;
+    
+      /* value has definitely changed (or it’s the first load) */
+      const newId = s.val();
+      if (newId === match()) return;        // already handled
+    
+      setMatch(newId);                      // remember the current match
+      resetMatchLocal();                    // 💥 local wipe, banner disappears immediately
+    });
+
   };
 
   const resetRoundLocal = () => {
