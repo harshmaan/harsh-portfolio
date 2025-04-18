@@ -120,25 +120,33 @@ const JoinSpyGame = () => {
 
   /* ─────────── host‑only helpers ─────────── */
   const generatePrompt = async () => {
-    // 1️⃣ Get the freshest graveyard straight from Firebase
+    /* 1️⃣ Get an authoritative roster */
+    const playersSnap = await get(ref(db, `${base()}/players`));
+    const rosterObj   = playersSnap.exists() ? playersSnap.val() : {};
+  
+    // turn it into a sorted array like your UI does
+    const roster = Object.entries(rosterObj)
+      .sort((a: any, b: any) => a[1].joinedAt - b[1].joinedAt)
+      .map(([id, val]: any) => ({ id, ...val }));
+  
+    /* 2️⃣ Get the definitive graveyard (persists within the match) */
     const deadSnap = await get(ref(db, `${base()}/dead`));
     const deadMap  = deadSnap.exists() ? deadSnap.val() : {};
   
-    // 2️⃣ Build an authoritative list of alive players
-    const live = players().filter(p => !deadMap[p.id]);
+    /* 3️⃣ Filter for living players */
+    const live = roster.filter((p) => !deadMap[p.id]);
     if (live.length < 3) {
       console.warn("Need at least 3 living players to start a round");
       return;
     }
   
-    // 3️⃣ Call your serverless function for prompts
+    /* 4️⃣ Ask your API for prompts */
     const res = await fetch("/api/spy-prompt");
     const { basePrompt, imposterPrompt } = await res.json();
   
-    // 4️⃣ Write the shared base prompt
     await set(ref(db, `${base()}/basePrompt`), basePrompt);
   
-    // 5️⃣ Randomly assign one Imposter among the live list
+    /* 5️⃣ Assign roles + personal prompts */
     const impIdx = Math.floor(Math.random() * live.length);
   
     await Promise.all(
@@ -154,6 +162,7 @@ const JoinSpyGame = () => {
       }),
     );
   };
+
 
 
   const startNextRound = async () => {
