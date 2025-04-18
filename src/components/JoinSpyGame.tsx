@@ -96,6 +96,9 @@ const JoinSpyGame = () => {
     setEliminated(null);
     setResponses({});
     setVotes({});
+    setGameOver(false);   
+    setWinner(null); 
+    setRole(null); 
   };
 
   const resetMatchLocal = () => {
