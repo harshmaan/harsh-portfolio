@@ -119,27 +119,41 @@ const JoinSpyGame = () => {
 
   /* ─────────── host‑only helpers ─────────── */
   const generatePrompt = async () => {
+    // 1️⃣ Get the freshest graveyard straight from Firebase
+    const deadSnap = await get(ref(db, `${base()}/dead`));
+    const deadMap  = deadSnap.exists() ? deadSnap.val() : {};
+  
+    // 2️⃣ Build an authoritative list of alive players
+    const live = players().filter(p => !deadMap[p.id]);
+    if (live.length < 3) {
+      console.warn("Need at least 3 living players to start a round");
+      return;
+    }
+  
+    // 3️⃣ Call your serverless function for prompts
     const res = await fetch("/api/spy-prompt");
     const { basePrompt, imposterPrompt } = await res.json();
-
+  
+    // 4️⃣ Write the shared base prompt
     await set(ref(db, `${base()}/basePrompt`), basePrompt);
-
-    /* pick Imposter from alive players */
-    const live = alivePlayers();
+  
+    // 5️⃣ Randomly assign one Imposter among the live list
     const impIdx = Math.floor(Math.random() * live.length);
+  
     await Promise.all(
       live.map((p, idx) => {
-        const r = idx === impIdx ? "Imposter" : "Collaborator";
+        const role = idx === impIdx ? "Imposter" : "Collaborator";
         return Promise.all([
-          set(ref(db, `${base()}/roles/${p.id}`), r),
+          set(ref(db, `${base()}/roles/${p.id}`), role),
           set(
             ref(db, `${base()}/personalPrompts/${p.id}`),
-            idx === impIdx ? imposterPrompt : basePrompt,
+            role === "Imposter" ? imposterPrompt : basePrompt,
           ),
         ]);
       }),
     );
   };
+
 
   const startNextRound = async () => {
     await Promise.all(
@@ -158,6 +172,7 @@ const JoinSpyGame = () => {
       set(ref(db, `${base()}/eliminated`), null),
       remove(ref(db, `${base()}/dead`)), 
     ]);
+    setDead({});
     await set(ref(db, `${base()}/matchId`), crypto.randomUUID());
   };
 
