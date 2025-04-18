@@ -112,6 +112,7 @@ const JoinSpyGame = () => {
   };
 
   const resetMatchLocal = () => {
+    setDead({});  
     resetRoundLocal();
     setGameOver(false);
     setWinner(null);
@@ -336,7 +337,7 @@ const JoinSpyGame = () => {
         </Show>
         
         {/* ─── Prompt section ─── */}
-        <Show when={(personalPrompt() || (isDead() && basePrompt())) && winner() === null && !votingPhase()}>
+        <Show when={(personalPrompt() || (isDead() && prompt())) && winner() === null && !votingPhase()}>
           <p class="mb-4">
             📝 <strong>Your Prompt:</strong> {personalPrompt() || basePrompt()}
           </p>
