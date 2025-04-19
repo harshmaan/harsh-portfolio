@@ -1,41 +1,39 @@
 ---
-// File: components/AboutMeCard.astro
 import Card from "./Card/index.astro";
 ---
 
 <Card colSpan="md:col-span-1" rowSpan="md:row-span-6" title="My Games">
-  <div class="flex flex-col gap-2 h-full justify-between">
+  <div class="flex flex-col gap-4 h-full justify-between">
+  
+    <!-- Spy Within Us -->
+    <div>
+      <strong class="block text-white text-xl font-bold">Spy Within Us</strong>
+      <p class="text-sm font-light mt-1">
+        is a live multiplayer social‑deduction game where one hidden Imposter crafts AI‑driven prompts alongside collaborators—and you must vote them out before they prevail.
+      </p>
+      <a href="/spy/join" class="block mt-2">
+        <button
+          class="w-full border-2 border-red-500 border-b-[3px] text-white bg-transparent hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg transition text-sm font-medium"
+        >
+          🔮 Play Spy Within Us
+        </button>
+      </a>
+    </div>
+  
+    <!-- Prompt Quest -->
+    <div>
+      <strong class="block text-white text-xl font-bold">Prompt Quest</strong>
+      <p class="text-sm font-light mt-1">
+        is a multiplayer AI‑powered storytelling game that sparks imagination through playful, constraint‑driven challenges.
+      </p>
+      <a href="/prompt-quest/join" class="block mt-2">
+        <button
+          class="w-full border-2 border-red-500 border-b-[3px] text-white bg-transparent hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg transition text-sm font-medium"
+        >
+          🧩 Play Prompt Quest
+        </button>
+      </a>
+    </div>
 
-
-    <!-- New line about the game -->
-    <p class="text-sm font-light mt-2">
-      <h2 class="text-white text-xl font-bold">Spy Within Us</h2><br>
-      is a live multiplayer social‑deduction game where one hidden Imposter crafts AI‑driven prompts alongside collaborators—and you must vote them out before they prevail.
-    </p>
-
-    <!-- Play Spy Within Us Button -->
-    <a href="/spy/join" class="mt-2">
-      <button
-        class="w-full border-2 border-red-500 border-b-[3px] text-white bg-transparent hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg transition text-sm font-medium"
-      >
-        🔮 Play Spy Within Us
-      </button>
-    </a>
-
-
-    <!-- New line about the game -->
-    <p class="text-sm font-light mt-2">
-      <h2 class="text-white text-xl font-bold">Prompt Quest</h2><br>
-      is a multiplayer AI‑powered storytelling game that sparks imagination through playful, constraint‑driven challenges.
-    </p>
-
-    <!-- 🧩 Play Prompt Quest Button -->
-    <a href="/prompt-quest/join" class="mt-2">
-      <button
-        class="w-full border-2 border-red-500 border-b-[3px] text-white bg-transparent hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg transition text-sm font-medium"
-      >
-        🧩 Play Prompt Quest
-      </button>
-    </a>
   </div>
 </Card>
