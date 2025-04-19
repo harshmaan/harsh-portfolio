@@ -5,17 +5,6 @@ import Card from "./Card/index.astro";
 
 <Card colSpan="md:col-span-1" rowSpan="md:row-span-6" title="About me">
   <div class="flex flex-col gap-2 h-full justify-between">
-    <div class="text-sm font-light">
-      <p>My primary tools of choice includes:</p>
-      <ul class="list-disc list-inside">
-        <li>LangChain</li>
-        <li>AI Agents</li>
-        <li>LangGraph</li>
-        <li>Snowflake</li>
-        <li>Python</li>
-        <li>SQL</li>
-      </ul>
-    </div>
 
     <p class="text-sm font-light">
       Beyond the code editor, you’ll usually find me:
@@ -28,7 +17,22 @@ import Card from "./Card/index.astro";
 
     <!-- New line about the game -->
     <p class="text-sm font-light mt-4">
-      <strong>I’ve just launched my first AI powered game — Prompt Quest! Give it a try and let me know what you think.</strong>
+      <strong>Spy Among Prompts is a live multiplayer social‑deduction game where one hidden Imposter crafts AI‑driven prompts alongside collaborators—and you must vote them out before they prevail.</strong>
+    </p>
+
+    <!-- Play Spy Within Us Button -->
+    <a href="/prompt-quest/join" class="mt-4">
+      <button
+        class="w-full border-2 border-red-500 border-b-[3px] text-white bg-transparent hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg transition text-sm font-medium"
+      >
+        🔮 Play Spy Within Us
+      </button>
+    </a>
+
+
+    <!-- New line about the game -->
+    <p class="text-sm font-light mt-4">
+      <strong>Prompt Quest is a multiplayer AI storytelling game: a host starts a session, players answer constraint‑based prompts, and an LLM scores submissions on creativity and humor.</strong>
     </p>
 
     <!-- 🧩 Play Prompt Quest Button -->
