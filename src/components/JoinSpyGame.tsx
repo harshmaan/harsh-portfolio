@@ -180,13 +180,11 @@ const JoinSpyGame = () => {
     } else {
       // 🔄 Subsequent rounds: leave /roles alone, just update personalPrompts
       await Promise.all(
-        live.map(p =>
-          set(ref(db, `${base()}/personalPrompts/${p.id}`),
-            (await get(ref(db, `${base()}/roles/${p.id}`))).val() === "Imposter"
-              ? imposterPrompt
-              : basePrompt
-          )
-        )
+        live.map(async (p) => {
+          const roleSnap = await get(ref(db, `${base()}/roles/${p.id}`));
+          const text = roleSnap.val() === "Imposter" ? imposterPrompt : basePrompt;
+          await set(ref(db, `${base()}/personalPrompts/${p.id}`), text);
+        })
       );
     }
   };
