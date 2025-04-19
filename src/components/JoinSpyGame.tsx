@@ -185,14 +185,23 @@ const JoinSpyGame = () => {
   };
 
   const startNewMatch = async () => {
+    // clear out last match’s per‐round data
     await startNextRound();
+  
+    // now wipe the old roles & prompts so the next match can reassign
     await Promise.all([
-      set(ref(db, `${base()}/winner`),     null), 
+      remove(ref(db, `${base()}/roles`)),
+      remove(ref(db, `${base()}/personalPrompts`)),
+      set(ref(db, `${base()}/winner`),     null),
       set(ref(db, `${base()}/gameOver`),   false),
       set(ref(db, `${base()}/eliminated`), null),
-      remove(ref(db, `${base()}/dead`)), 
+      remove(ref(db, `${base()}/dead`)),
     ]);
+  
+    // clear local graveyard immediately
     setDead({});
+  
+    // bump the matchId so everyone resets
     await set(ref(db, `${base()}/matchId`), crypto.randomUUID());
   };
 
