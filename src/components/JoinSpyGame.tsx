@@ -113,14 +113,14 @@ const JoinSpyGame = () => {
     setVotingPhase(false);
     setHasSubmitted(false);
     setPrompt("");
-    setPersonalPrompt("");
+//    setPersonalPrompt("");
     setResponse("");
     setEliminated(null);
     setResponses({});
     setVotes({});
 //    setGameOver(false);   
 //    setWinner(null); 
-    setRole(null); 
+//    setRole(null); 
   };
 
   const resetMatchLocal = () => {
@@ -177,7 +177,7 @@ const JoinSpyGame = () => {
 
   const startNextRound = async () => {
     await Promise.all(
-      ["basePrompt", "roles", "personalPrompts", "responses", "votes", "eliminated"].map((k) =>
+      ["basePrompt","responses","votes","eliminated"].map((k) =>
         remove(ref(db, `${base()}/${k}`)),
       ),
     );
