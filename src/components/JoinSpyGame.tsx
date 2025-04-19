@@ -228,7 +228,7 @@ const JoinSpyGame = () => {
     } else if (remaining === 2) { 
       await set(ref(db, `${base()}/winner`), "Imposter");
       await set(ref(db, `${base()}/gameOver`), true);
-    } else if (isHost()) {
+    } else if (!isDead() && remaining >= 3) {
       await startNextRound();
       await generatePrompt();
     }
