@@ -123,7 +123,7 @@ const JoinSpyGame = () => {
     setVotingPhase(false);
     setHasSubmitted(false);
     setPrompt("");
-//    setPersonalPrompt("");
+    setPersonalPrompt("");
     setResponse("");
     setEliminated(null);
     setResponses({});
