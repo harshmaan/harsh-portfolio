@@ -359,7 +359,7 @@ const JoinSpyGame = () => {
         {/* ─── Prompt section ─── */}
         <Show when={(personalPrompt() || (isDead() && prompt())) && winner() === null && !votingPhase()}>
           <p class="mb-4">
-            📝 <strong>Your Prompt:</strong> {personalPrompt() || basePrompt()}
+            📝 <strong>Your Prompt:</strong> {personalPrompt() || prompt()}
           </p>
         
           {/* Alive players get the textarea */}
