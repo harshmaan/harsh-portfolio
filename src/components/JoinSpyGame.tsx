@@ -15,6 +15,7 @@ import { ref, set, onValue, remove, get } from "firebase/database";
  * ├─ votes/{voterId}      → votedPlayerId
  * ├─ eliminated           → playerId       // round banner only
  * ├─ winner               → "Imposter" | "Collaborators"
+ * ├─ hostId               → playerId    // permanent host
  * ├─ gameOver             → boolean
  * ├─ roundId              → uuid  (round reset)
  * └─ matchId              → uuid  (full lobby reset)
@@ -39,10 +40,11 @@ const JoinSpyGame = () => {
   const [eliminated, setEliminated]   = createSignal<string | null>(null);
   const [gameOver, setGameOver]       = createSignal(false);
   const [winner, setWinner]           = createSignal<"Imposter" | "Collaborators" | null>(null);
+  const [permaHostId, setPermaHostId] = createSignal<string | null>(null);
 
   /* ─────────── helpers ─────────── */
   const base        = () => `spy/${sessionId()}`;
-  const isHost      = () => players()[0]?.id === playerId();
+  const isHost      = () => permaHostId() === playerId();
   const alivePlayers = () => players().filter(p => !dead()[p.id]);
   const isDead      = () => !!dead()[playerId()];
 
@@ -56,11 +58,21 @@ const JoinSpyGame = () => {
     });
     setJoined(true);
 
+    const hostSnap = await get(ref(db, `${base()}/hostId`));
+    if (!hostSnap.exists()) {
+      await set(ref(db, `${base()}/hostId`), id);
+    }
+
+
     /* players list (sorted) */
     onValue(ref(db, `${base()}/players`), snap => {
       const data = snap.val() || {};
       const sorted = Object.entries(data).sort((a:any,b:any)=>a[1].joinedAt-b[1].joinedAt);
       setPlayers(sorted.map(([pid,val]:any) => ({ id: pid, ...val })));
+    });
+
+    onValue(ref(db, `${base()}/hostId`), s => {
+      if (s.exists()) setPermaHostId(s.val());
     });
 
     /* graveyard */
@@ -317,6 +329,7 @@ const JoinSpyGame = () => {
         <Show
           when={
             isHost() &&
+            !isDead() &&  
             alivePlayers().length >= 3 &&
             !prompt() &&
             !personalPrompt() &&
