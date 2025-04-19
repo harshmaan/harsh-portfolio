@@ -58,7 +58,7 @@ const JoinSpyGame = () => {
       joinedAt: Date.now(),
     });
     setJoined(true);
-
+    const hostSnap = await get(ref(db, `${base()}/hostId`));
     const hostIdOnServer = hostSnap.exists() ? hostSnap.val() : null;
     const hostStillHere  = hostIdOnServer && (await get(ref(db, `${base()}/players/${hostIdOnServer}`))).exists();
     if (!hostStillHere) await set(ref(db, `${base()}/hostId`), id);   // promote myself
