@@ -140,48 +140,57 @@ const JoinSpyGame = () => {
 
   /* ─────────── host‑only helpers ─────────── */
   const generatePrompt = async () => {
-    /* 1️⃣ Get an authoritative roster */
+    /* 1️⃣ Fetch your prompts from the API */
+    const res = await fetch("/api/spy-prompt");
+    const { basePrompt, imposterPrompt } = await res.json();
+    await set(ref(db, `${base()}/basePrompt`), basePrompt);
+  
+    /* 2️⃣ Only assign roles on the very first round of this match */
+    const rolesSnap = await get(ref(db, `${base()}/roles`));
+    const firstRound = !rolesSnap.exists();
+  
+    /* 3️⃣ Build the current live roster */
     const playersSnap = await get(ref(db, `${base()}/players`));
     const rosterObj   = playersSnap.exists() ? playersSnap.val() : {};
+    const deadSnap    = await get(ref(db, `${base()}/dead`));
+    const deadMap     = deadSnap.exists() ? deadSnap.val() : {};
+    const live        = Object.entries(rosterObj)
+      .sort((a:any,b:any)=>a[1].joinedAt-b[1].joinedAt)
+      .map(([id,val]:any)=>({ id, ...val }))
+      .filter(p => !deadMap[p.id]);
   
-    // turn it into a sorted array like your UI does
-    const roster = Object.entries(rosterObj)
-      .sort((a: any, b: any) => a[1].joinedAt - b[1].joinedAt)
-      .map(([id, val]: any) => ({ id, ...val }));
-  
-    /* 2️⃣ Get the definitive graveyard (persists within the match) */
-    const deadSnap = await get(ref(db, `${base()}/dead`));
-    const deadMap  = deadSnap.exists() ? deadSnap.val() : {};
-  
-    /* 3️⃣ Filter for living players */
-    const live = roster.filter((p) => !deadMap[p.id]);
     if (live.length < 3) {
       console.warn("Need at least 3 living players to start a round");
       return;
     }
   
-    /* 4️⃣ Ask your API for prompts */
-    const res = await fetch("/api/spy-prompt");
-    const { basePrompt, imposterPrompt } = await res.json();
-  
-    await set(ref(db, `${base()}/basePrompt`), basePrompt);
-  
-    /* 5️⃣ Assign roles + personal prompts */
-    const impIdx = Math.floor(Math.random() * live.length);
-  
-    await Promise.all(
-      live.map((p, idx) => {
-        const role = idx === impIdx ? "Imposter" : "Collaborator";
-        return Promise.all([
-          set(ref(db, `${base()}/roles/${p.id}`), role),
-          set(
-            ref(db, `${base()}/personalPrompts/${p.id}`),
-            role === "Imposter" ? imposterPrompt : basePrompt,
-          ),
-        ]);
-      }),
-    );
+    if (firstRound) {
+      // 🔥 First round: pick one Imposter and write /roles + /personalPrompts
+      const impIdx = Math.floor(Math.random() * live.length);
+      await Promise.all(
+        live.map((p, idx) =>
+          Promise.all([
+            set(ref(db, `${base()}/roles/${p.id}`), idx === impIdx ? "Imposter" : "Collaborator"),
+            set(ref(db, `${base()}/personalPrompts/${p.id}`),
+              idx === impIdx ? imposterPrompt : basePrompt
+            ),
+          ])
+        )
+      );
+    } else {
+      // 🔄 Subsequent rounds: leave /roles alone, just update personalPrompts
+      await Promise.all(
+        live.map(p =>
+          set(ref(db, `${base()}/personalPrompts/${p.id}`),
+            (await get(ref(db, `${base()}/roles/${p.id}`))).val() === "Imposter"
+              ? imposterPrompt
+              : basePrompt
+          )
+        )
+      );
+    }
   };
+
 
 
 
