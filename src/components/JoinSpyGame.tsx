@@ -41,6 +41,7 @@ const JoinSpyGame = () => {
   const [gameOver, setGameOver]       = createSignal(false);
   const [winner, setWinner]           = createSignal<"Imposter" | "Collaborators" | null>(null);
   const [permaHostId, setPermaHostId] = createSignal<string | null>(null);
+  const [matchId, setMatchId]         = createSignal<string | null>(null);
 
   /* ─────────── helpers ─────────── */
   const base        = () => `spy/${sessionId()}`;
@@ -101,9 +102,9 @@ const JoinSpyGame = () => {
     
       /* value has definitely changed (or it’s the first load) */
       const newId = s.val();
-      if (newId === match()) return;        // already handled
+      if (newId === matchId()) return; // already handled
     
-      setMatch(newId);                      // remember the current match
+      setMatchId(newId);                     // remember the current match
       resetMatchLocal();                    // 💥 local wipe, banner disappears immediately
     });
 
@@ -227,7 +228,7 @@ const JoinSpyGame = () => {
     } else if (remaining === 2) { 
       await set(ref(db, `${base()}/winner`), "Imposter");
       await set(ref(db, `${base()}/gameOver`), true);
-    } else if (isHost()) {
+    } else if (isHost() && !isDead()) {
       await startNextRound();
       await generatePrompt();
     }
