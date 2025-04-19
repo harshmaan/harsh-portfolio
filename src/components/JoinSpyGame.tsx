@@ -296,6 +296,7 @@ const JoinSpyGame = () => {
         <div class="flex justify-center items-center min-h-[90vh] px-4">
           <div class="max-w-md w-full space-y-6 text-center">
             <h1 class="text-3xl font-bold">🕵️ Enter the Arena</h1>
+      
             <div class="space-y-4">
               <input
                 type="text"
@@ -318,33 +319,35 @@ const JoinSpyGame = () => {
                 disabled={!name().trim() || !sessionId().trim()}
                 onClick={handleJoin}
               >
-                Enter Game
+                🚀 Enter Game
               </button>
             </div>
+      
             {/* Concept & Instructions panel */}
             <div class="text-left mt-6 p-4 bg-neutral-900 border border-neutral-700 rounded space-y-4 text-sm leading-relaxed text-gray-300">
               <div>
                 <h2 class="text-white font-semibold text-base">Concept</h2>
                 <p>
-                  Players receive AI‑generated writing prompts each round—one secret Imposter gets a misleading variation while Collaborators share the base prompt.  
-                  After everyone submits, responses go anonymous and you vote to eliminate the suspected Imposter.
+                  Players receive AI‑generated writing prompts each round—one secret Imposter gets a misleading variation while
+                  Collaborators share the base prompt. After submissions, responses are anonymized and you vote to unmask the Imposter.
                 </p>
               </div>
-      
               <div>
                 <h2 class="text-white font-semibold text-base">Instructions</h2>
                 <ol class="list-decimal list-inside space-y-1">
-                  <li>Enter your name and a session ID; the first to join becomes host.</li>
-                  <li>Host clicks “Join Game” then “Start Match” to assign roles and draw the first prompt.</li>
+                  <li>Enter your name and session ID; the first to join becomes host.</li>
+                  <li>Host clicks “Enter Game” then “Start Match” to assign roles and draw the first prompt.</li>
                   <li>Alive players craft a response to their personal prompt; eliminated players spectate.</li>
                   <li>Once everyone’s in, vote on who to eliminate.</li>
                   <li>If the Imposter is caught, Collaborators win; if only two remain, the Imposter wins.</li>
-                  <li>Host may start a new round or a new match to reshuffle and play again.</li>
+                  <li>Host can start a new round or a new match to reshuffle and play again.</li>
                 </ol>
               </div>
-          </div>
-        </div>
+            </div>
+          </div> {/* end max-w-md */}
+        </div>   {/* end flex container */}
       </Show>
+
 
 
       {/* ───── In‑Game View ───── */}
