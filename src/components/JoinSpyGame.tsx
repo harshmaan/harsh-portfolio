@@ -126,8 +126,6 @@ const JoinSpyGame = () => {
   const resetMatchLocal = () => {
     setDead({});  
     resetRoundLocal();
-    setGameOver(false);
-    setWinner(null);
   };
 
   /* ─────────── host‑only helpers ─────────── */
