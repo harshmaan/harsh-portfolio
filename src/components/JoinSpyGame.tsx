@@ -294,7 +294,7 @@ const JoinSpyGame = () => {
       {/* ───── Join Form ───── */}
       <Show when={!joined()}>
         <div class="space-y-4 text-center">
-          <h1 class="text-3xl font-bold">🕵️ Join Spy Among Prompts</h1>
+          <h1 class="text-3xl font-bold">🕵️ Join Spy Within Us</h1>
           <input
             class="w-full p-2 bg-neutral-800 border border-neutral-600 rounded"
             placeholder="Name"
@@ -385,7 +385,7 @@ const JoinSpyGame = () => {
         {/* ─── Prompt section ─── */}
         <Show when={(personalPrompt() || (isDead() && prompt())) && winner() === null && !votingPhase()}>
           <p class="mb-4">
-            📝 <strong>Your Prompt:</strong> {personalPrompt() || prompt()}
+            📝 <strong>Task:</strong> {personalPrompt() || prompt()}
           </p>
         
           {/* Alive players get the textarea */}
