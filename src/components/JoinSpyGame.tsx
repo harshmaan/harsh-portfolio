@@ -79,7 +79,17 @@ const JoinSpyGame = () => {
     onValue(ref(db, `${base()}/dead`), snap => setDead(snap.val() || {}));
 
     /* personal role & prompt */
-    onValue(ref(db, `${base()}/roles/${id}`),            s => s.exists() && setRole(s.val()));
+    onValue(
+      ref(db, `${base()}/roles/${id}`),
+      (snap) => {
+        if (snap.exists()) {
+          setRole(snap.val());
+        } else {
+          setRole(null);
+        }
+      }
+    );
+
     onValue(ref(db, `${base()}/personalPrompts/${id}`),  s => s.exists() && setPersonalPrompt(s.val()));
 
     /* shared state */
