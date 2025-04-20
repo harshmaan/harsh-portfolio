@@ -42,6 +42,10 @@ const JoinSpyGame = () => {
   const [winner, setWinner]           = createSignal<"Imposter" | "Collaborators" | null>(null);
   const [permaHostId, setPermaHostId] = createSignal<string | null>(null);
   const [matchId, setMatchId]         = createSignal<string | null>(null);
+  const [chatInput,    setChatInput]    = createSignal("");
+  const [chatMessages, setChatMessages] = createSignal<
+    { id: string; authorName: string; text: string; timestamp: number }[]
+  >([]);
 
   /* ─────────── helpers ─────────── */
   const base        = () => `spy/${sessionId()}`;
@@ -63,6 +67,19 @@ const JoinSpyGame = () => {
     const hostStillHere  = hostIdOnServer && (await get(ref(db, `${base()}/players/${hostIdOnServer}`))).exists();
     if (!hostStillHere) await set(ref(db, `${base()}/hostId`), id);   // promote myself
 
+    // ───── Chat listener ─────
+    onValue(ref(db, `${base()}/chat`), snap => {
+      const data = snap.val() || {};
+      const msgs = Object.entries(data)
+        .map(([id, msg]: any) => ({
+          id,
+          authorName: msg.authorName,
+          text:       msg.text,
+          timestamp:  msg.timestamp,
+        }))
+        .sort((a, b) => a.timestamp - b.timestamp);
+      setChatMessages(msgs);
+    });
 
     /* players list (sorted) */
     onValue(ref(db, `${base()}/players`), snap => {
@@ -231,6 +248,20 @@ const JoinSpyGame = () => {
 
   const handleVote = (target: string) =>
     set(ref(db, `${base()}/votes/${playerId()}`), target);
+
+  const handleSendMessage = async () => {
+    const text = chatInput().trim();
+    if (!text) return;
+    const msgId = crypto.randomUUID();
+    await set(ref(db, `${base()}/chat/${msgId}`), {
+      authorId:   playerId(),
+      authorName: name(),
+      text,
+      timestamp:  Date.now(),
+    });
+    setChatInput("");
+  };
+
 
   /* ─────────── vote tally & progression ─────────── */
   const tallyVotesAndEliminate = async () => {
@@ -495,6 +526,39 @@ const JoinSpyGame = () => {
                 </div>
               )}
             </For>
+          </div>
+        </Show>
+
+                {/* ─── Discussion Chat ─── */}
+        <Show when={votingPhase() && !gameOver()}>
+          <div class="mt-6">
+            <h3 class="text-lg font-semibold mb-2">💬 Discussion</h3>
+            <div class="max-h-48 overflow-y-auto mb-3 space-y-1 px-2">
+              <For each={chatMessages()}>
+                {(msg) => (
+                  <div class="text-sm">
+                    <strong>{msg.authorName}:</strong> {msg.text}
+                  </div>
+                )}
+              </For>
+            </div>
+            <div class="flex gap-2">
+              <input
+                type="text"
+                placeholder="Type a message..."
+                class="flex-1 bg-neutral-800 border border-neutral-600 p-2 rounded text-sm"
+                value={chatInput()}
+                onInput={(e) => setChatInput(e.currentTarget.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!chatInput().trim()}
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+              >
+                Send
+              </button>
+            </div>
           </div>
         </Show>
 
