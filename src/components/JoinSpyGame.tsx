@@ -287,6 +287,12 @@ const JoinSpyGame = () => {
         {role() === "Imposter" ? "😈 You are the Imposter" : "🫶 You are a Collaborator"}
       </div>
     );
+  // returns an array of player‐names who voted for the given responseId
+  const votersFor = (responseId: string) =>
+    Object.entries(votes())
+      .filter(([, targetId]) => targetId === responseId)
+      .map(([voterId]) => players().find(p => p.id === voterId)?.name || "Unknown");
+
 
   /* ─────────── JSX layout ─────────── */
   return (
@@ -462,7 +468,7 @@ const JoinSpyGame = () => {
               {([id, resp]) => (
                 <div class="mb-2 p-2 border border-neutral-600 bg-neutral-800 rounded">
                   <p class="text-sm italic">{resp}</p>
-
+            
                   <Show
                     when={
                       votingPhase() &&
@@ -478,6 +484,13 @@ const JoinSpyGame = () => {
                     >
                       Vote to Eliminate
                     </button>
+                  </Show>
+            
+                  {/* ← new block ↓ */}
+                  <Show when={votersFor(id).length > 0}>
+                    <p class="mt-1 text-xs text-gray-400">
+                      Voted by: {votersFor(id).join(", ")}
+                    </p>
                   </Show>
                 </div>
               )}
