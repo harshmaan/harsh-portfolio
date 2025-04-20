@@ -529,20 +529,24 @@ const JoinSpyGame = () => {
           </div>
         </Show>
 
-                {/* ─── Discussion Chat ─── */}
+        {/* ─── Discussion Chat (single card) ─── */}
         <Show when={votingPhase() && !gameOver()}>
-          <div class="mt-6">
-            <h3 class="text-lg font-semibold mb-2">💬 Discussion</h3>
-            <div class="max-h-48 overflow-y-auto mb-3 space-y-1 px-2">
+          <div class="mt-6 p-4 bg-neutral-900 border border-neutral-700 rounded-lg">
+            <h3 class="text-lg font-semibold mb-4">💬 Discussion</h3>
+        
+            {/* messages container */}
+            <div class="max-h-48 overflow-y-auto space-y-2">
               <For each={chatMessages()}>
                 {(msg) => (
-                  <div class="text-sm">
-                    <strong>{msg.authorName}:</strong> {msg.text}
-                  </div>
+                  <p class="text-sm">
+                    <strong class="text-white">{msg.authorName}:</strong> {msg.text}
+                  </p>
                 )}
               </For>
             </div>
-            <div class="flex gap-2">
+        
+            {/* input + send */}
+            <div class="flex gap-2 mt-4">
               <input
                 type="text"
                 placeholder="Type a message..."
