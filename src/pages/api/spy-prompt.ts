@@ -61,7 +61,7 @@ Now give one fresh pair.
   } catch (err: any) {
     console.error("🔴 spy-prompt error:", err.message || err);
     return new Response(
-      JSON.stringify({ error: "Failed to generate prompts." }),
+      JSON.stringify({ error: err?.message || "Failed to generate prompts." }),
       { status: 500 }
     );
   }

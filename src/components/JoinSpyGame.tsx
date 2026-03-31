@@ -71,6 +71,8 @@ const JoinSpyGame = () => {
   const [chatMessages, setChatMessages] = createSignal<
     { id: string; authorName: string; text: string; timestamp: number }[]
   >([]);
+  const [startingMatch, setStartingMatch] = createSignal(false);
+  const [matchError, setMatchError]       = createSignal("");
 
   /* ─────────── listener cleanup tracking ─────────── */
   const unsubscribers: Unsubscribe[] = [];
@@ -191,53 +193,72 @@ const JoinSpyGame = () => {
 
   /* ─────────── host‑only helpers ─────────── */
   const generatePrompt = async () => {
-    const { db, fb: f } = fb();
-    const { ref, set, get } = f;
+    setStartingMatch(true);
+    setMatchError("");
+    try {
+      const { db, fb: f } = fb();
+      const { ref, set, get } = f;
 
-    // Fetch API prompt and Firebase state in parallel
-    const [promptRes, rolesSnap, playersSnap, deadSnap] = await Promise.all([
-      fetch("/api/spy-prompt"),
-      get(ref(db, `${base()}/roles`)),
-      get(ref(db, `${base()}/players`)),
-      get(ref(db, `${base()}/dead`)),
-    ]);
-    const { basePrompt, imposterPrompt } = await promptRes.json();
-    await set(ref(db, `${base()}/basePrompt`), basePrompt);
+      // Fetch API prompt and Firebase state in parallel
+      const [promptRes, rolesSnap, playersSnap, deadSnap] = await Promise.all([
+        fetch("/api/spy-prompt"),
+        get(ref(db, `${base()}/roles`)),
+        get(ref(db, `${base()}/players`)),
+        get(ref(db, `${base()}/dead`)),
+      ]);
 
-    const firstRound = !rolesSnap.exists();
+      if (!promptRes.ok) {
+        const errBody = await promptRes.json().catch(() => ({}));
+        throw new Error(errBody.error || `Prompt API returned ${promptRes.status}`);
+      }
 
-    const rosterObj   = playersSnap.exists() ? playersSnap.val() : {};
-    const deadMap     = deadSnap.exists() ? deadSnap.val() : {};
-    const live        = Object.entries(rosterObj)
-      .sort((a:any,b:any)=>a[1].joinedAt-b[1].joinedAt)
-      .map(([id,val]:any)=>({ id, ...val }))
-      .filter(p => !deadMap[p.id]);
-  
-    if (live.length < 3) {
-      console.warn("Need at least 3 living players to start a round");
-      return;
-    }
-  
-    if (firstRound) {
-      const impIdx = Math.floor(Math.random() * live.length);
-      await Promise.all(
-        live.map((p, idx) =>
-          Promise.all([
-            set(ref(db, `${base()}/roles/${p.id}`), idx === impIdx ? "Imposter" : "Collaborator"),
-            set(ref(db, `${base()}/personalPrompts/${p.id}`),
-              idx === impIdx ? imposterPrompt : basePrompt
-            ),
-          ])
-        )
-      );
-    } else {
-      await Promise.all(
-        live.map(async (p) => {
-          const roleSnap = await get(ref(db, `${base()}/roles/${p.id}`));
-          const text = roleSnap.val() === "Imposter" ? imposterPrompt : basePrompt;
-          await set(ref(db, `${base()}/personalPrompts/${p.id}`), text);
-        })
-      );
+      const { basePrompt, imposterPrompt } = await promptRes.json();
+
+      if (!basePrompt || !imposterPrompt) {
+        throw new Error("AI failed to generate prompts — try again.");
+      }
+
+      await set(ref(db, `${base()}/basePrompt`), basePrompt);
+
+      const firstRound = !rolesSnap.exists();
+
+      const rosterObj   = playersSnap.exists() ? playersSnap.val() : {};
+      const deadMap     = deadSnap.exists() ? deadSnap.val() : {};
+      const live        = Object.entries(rosterObj)
+        .sort((a:any,b:any)=>a[1].joinedAt-b[1].joinedAt)
+        .map(([id,val]:any)=>({ id, ...val }))
+        .filter(p => !deadMap[p.id]);
+    
+      if (live.length < 3) {
+        throw new Error("Need at least 3 living players to start a round.");
+      }
+    
+      if (firstRound) {
+        const impIdx = Math.floor(Math.random() * live.length);
+        await Promise.all(
+          live.map((p, idx) =>
+            Promise.all([
+              set(ref(db, `${base()}/roles/${p.id}`), idx === impIdx ? "Imposter" : "Collaborator"),
+              set(ref(db, `${base()}/personalPrompts/${p.id}`),
+                idx === impIdx ? imposterPrompt : basePrompt
+              ),
+            ])
+          )
+        );
+      } else {
+        await Promise.all(
+          live.map(async (p) => {
+            const roleSnap = await get(ref(db, `${base()}/roles/${p.id}`));
+            const text = roleSnap.val() === "Imposter" ? imposterPrompt : basePrompt;
+            await set(ref(db, `${base()}/personalPrompts/${p.id}`), text);
+          })
+        );
+      }
+    } catch (err: any) {
+      console.error("generatePrompt error:", err);
+      setMatchError(err?.message || "Something went wrong. Try again.");
+    } finally {
+      setStartingMatch(false);
     }
   };
 
@@ -570,10 +591,19 @@ const JoinSpyGame = () => {
                   </div>
                   <button
                     onClick={generatePrompt}
-                    class="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/20 active:scale-[0.98]"
+                    disabled={startingMatch()}
+                    class="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/20 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    Start Match
+                    {startingMatch() ? (
+                      <span class="inline-flex items-center gap-2">
+                        <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Generating Prompt…
+                      </span>
+                    ) : "Start Match"}
                   </button>
+                  <Show when={matchError()}>
+                    <p class="mt-4 text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2">{matchError()}</p>
+                  </Show>
                 </Show>
                 <Show when={isHost() && alivePlayers().length < 3}>
                   <div class="py-4">
