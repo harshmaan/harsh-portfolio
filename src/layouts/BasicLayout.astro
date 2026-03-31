@@ -238,6 +238,36 @@ const schema =
     border-top-left-radius: 0;
   }
 
+  .chat-bubble.bot strong { font-weight: 700; }
+  .chat-bubble.bot em { font-style: italic; }
+  .chat-bubble.bot code {
+    background: #2a2a2a;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    font-size: 0.82em;
+  }
+  .chat-bubble.bot pre {
+    background: #2a2a2a;
+    padding: 0.5rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 0.4rem 0;
+  }
+  .chat-bubble.bot ul {
+    margin: 0.3rem 0;
+    padding-left: 1.2rem;
+  }
+  .chat-bubble.bot li {
+    margin-bottom: 0.15rem;
+  }
+  .chat-bubble.bot h2,
+  .chat-bubble.bot h3,
+  .chat-bubble.bot h4 {
+    margin: 0.4rem 0 0.2rem;
+    font-size: 0.95em;
+    font-weight: 700;
+  }
+
   @keyframes shimmer {
     0% {
       transform: translateX(-100%);

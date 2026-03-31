@@ -1,3 +1,28 @@
+/** Lightweight Markdown → HTML (covers what Gemini typically returns) */
+function miniMarkdown(text) {
+  return text
+    // code blocks ```...```
+    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+    // inline code
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // bold + italic
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    // bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // italic
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // unordered list items (*, -, •)
+    .replace(/^[\*\-•]\s+(.+)$/gm, '<li>$1</li>')
+    // wrap consecutive <li> in <ul>
+    .replace(/((?:<li>.*<\/li>\s*)+)/g, '<ul>$1</ul>')
+    // headings
+    .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+    // line breaks
+    .replace(/\n/g, '<br>');
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("chat-form");
   const input = document.getElementById("chat-input");
@@ -72,7 +97,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       const botEl = document.createElement("div");
       botEl.className = "chat-bubble bot";
-      botEl.innerHTML = `<p>🤖 ${data.response || "Hmm... no answer."}</p>`;
+      const rendered = miniMarkdown(data.response || "Hmm... no answer.");
+      botEl.innerHTML = `<div>🤖 ${rendered}</div>`;
       messages.appendChild(botEl);
 
       messages.scrollTop = messages.scrollHeight;
