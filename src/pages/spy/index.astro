@@ -1,36 +1,142 @@
 ---
+import BasicLayout from "../../layouts/BasicLayout.astro";
 ---
 
-<html lang="en">
-  <body class="bg-black text-white p-6 flex flex-col items-center justify-center min-h-screen">
-    <h1 class="text-3xl font-bold mb-4">🕵️ Join Spy Among Prompts</h1>
-    <form
-      id="spy-join-form"
-      class="flex flex-col gap-4 w-full max-w-md"
-    >
-      <input
-        type="text"
-        name="name"
-        placeholder="Your name"
-        class="p-3 rounded bg-neutral-800 border border-neutral-600 text-white"
-        required
-      />
-      <input
-        type="text"
-        name="sessionId"
-        placeholder="Session ID"
-        class="p-3 rounded bg-neutral-800 border border-neutral-600 text-white"
-        required
-      />
-      <button
-        type="submit"
-        class="bg-red-600 hover:bg-red-700 py-2 px-4 rounded"
-      >
-        🚀 Start Game
-      </button>
-    </form>
-  </body>
-</html>
+<BasicLayout title="The Spy Within Us — Harsh Maan" description="A multiplayer social deduction game powered by AI-generated prompts. Unmask the imposter among your friends.">
+  <main class="min-h-screen text-white">
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden py-20 px-6">
+      <!-- Subtle radial glow -->
+      <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse at 50% 0%, rgba(230,57,70,0.08) 0%, transparent 60%);"></div>
+      
+      <div class="max-w-4xl mx-auto text-center relative z-10">
+        <a href="/" class="text-sm text-gray-400 hover:text-white mb-8 inline-block transition-colors">← Back to Home</a>
+        
+        <div class="mb-6">
+          <span class="inline-block text-6xl mb-4 spy-icon">🕵️</span>
+        </div>
+        
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">The Spy Within Us</h1>
+        <p class="text-gray-400 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+          A multiplayer social deduction game powered by AI. Everyone gets a writing prompt — except the imposter, who gets a <em class="text-primary-400">subtly different</em> one. Can you spot the odd one out?
+        </p>
+
+        <!-- Join Form Card -->
+        <div class="max-w-md mx-auto bg-darkslate-500 border border-darkslate-100 rounded-2xl p-8">
+          <h2 class="text-xl font-bold mb-6">Join a Game</h2>
+          <form id="spy-join-form" class="space-y-4">
+            <div>
+              <input
+                type="text"
+                name="name"
+                placeholder="Your name"
+                required
+                class="w-full bg-darkslate-300 border border-darkslate-100 text-white px-4 py-3 rounded-xl outline-none focus:border-primary-500 transition-colors placeholder:text-gray-500"
+              />
+            </div>
+            <div>
+              <input
+                type="text"
+                name="sessionId"
+                placeholder="Session ID (share with friends)"
+                required
+                class="w-full bg-darkslate-300 border border-darkslate-100 text-white px-4 py-3 rounded-xl outline-none focus:border-primary-500 transition-colors placeholder:text-gray-500"
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/20 active:scale-[0.98]"
+            >
+              Enter Game →
+            </button>
+          </form>
+          <p class="text-xs text-gray-500 mt-4">First player to join becomes the host</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-16 px-6">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-2xl font-bold text-center mb-12">How It Works</h2>
+
+        <div class="grid gap-6 md:grid-cols-4">
+          <div class="bg-darkslate-500 border border-darkslate-100 rounded-xl p-6 text-center group hover:border-primary-500/40 transition-all duration-300">
+            <div class="text-3xl mb-3">👥</div>
+            <h3 class="font-bold mb-2">1. Gather</h3>
+            <p class="text-sm text-gray-400">3+ players join the same session. The host controls the game flow.</p>
+          </div>
+
+          <div class="bg-darkslate-500 border border-darkslate-100 rounded-xl p-6 text-center group hover:border-primary-500/40 transition-all duration-300">
+            <div class="text-3xl mb-3">🤖</div>
+            <h3 class="font-bold mb-2">2. AI Prompts</h3>
+            <p class="text-sm text-gray-400">Gemini generates a writing prompt. The imposter gets a sneaky variation.</p>
+          </div>
+
+          <div class="bg-darkslate-500 border border-darkslate-100 rounded-xl p-6 text-center group hover:border-primary-500/40 transition-all duration-300">
+            <div class="text-3xl mb-3">✍️</div>
+            <h3 class="font-bold mb-2">3. Write</h3>
+            <p class="text-sm text-gray-400">Everyone writes a response. Responses are anonymized and revealed together.</p>
+          </div>
+
+          <div class="bg-darkslate-500 border border-darkslate-100 rounded-xl p-6 text-center group hover:border-primary-500/40 transition-all duration-300">
+            <div class="text-3xl mb-3">🗳️</div>
+            <h3 class="font-bold mb-2">4. Vote</h3>
+            <p class="text-sm text-gray-400">Discuss, debate, and vote to eliminate. Catch the imposter to win!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features / Details -->
+    <section class="py-16 px-6 border-t border-darkslate-100">
+      <div class="max-w-4xl mx-auto">
+        <div class="grid gap-6 md:grid-cols-3">
+          <div class="bg-darkslate-500/50 border border-darkslate-100 rounded-xl p-6">
+            <div class="text-sm font-mono text-primary-400 mb-2">Real-time</div>
+            <h3 class="font-bold mb-2">Multiplayer via Firebase</h3>
+            <p class="text-sm text-gray-400">Instant sync across all players. No refresh needed — everything updates live.</p>
+          </div>
+          <div class="bg-darkslate-500/50 border border-darkslate-100 rounded-xl p-6">
+            <div class="text-sm font-mono text-primary-400 mb-2">AI-Powered</div>
+            <h3 class="font-bold mb-2">Gemini Prompt Generation</h3>
+            <p class="text-sm text-gray-400">Every round gets a fresh, creative prompt — with a cleverly misleading imposter version.</p>
+          </div>
+          <div class="bg-darkslate-500/50 border border-darkslate-100 rounded-xl p-6">
+            <div class="text-sm font-mono text-primary-400 mb-2">Social</div>
+            <h3 class="font-bold mb-2">In-Game Discussion</h3>
+            <p class="text-sm text-gray-400">Built-in chat during voting phase. Accuse, defend, bluff — just like the real thing.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Built With -->
+    <section class="py-12 px-6 border-t border-darkslate-100">
+      <div class="max-w-4xl mx-auto text-center">
+        <p class="text-sm text-gray-500 mb-4">Built with</p>
+        <div class="flex flex-wrap justify-center gap-2">
+          <span class="text-xs bg-darkslate-500 border border-darkslate-100 px-3 py-1.5 rounded-full text-gray-300">SolidJS</span>
+          <span class="text-xs bg-darkslate-500 border border-darkslate-100 px-3 py-1.5 rounded-full text-gray-300">Firebase Realtime DB</span>
+          <span class="text-xs bg-darkslate-500 border border-darkslate-100 px-3 py-1.5 rounded-full text-gray-300">Gemini AI</span>
+          <span class="text-xs bg-darkslate-500 border border-darkslate-100 px-3 py-1.5 rounded-full text-gray-300">Astro SSR</span>
+          <span class="text-xs bg-darkslate-500 border border-darkslate-100 px-3 py-1.5 rounded-full text-gray-300">Netlify Edge</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</BasicLayout>
+
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .spy-icon {
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+  }
+</style>
 
 <script>
   const form = document.getElementById("spy-join-form") as HTMLFormElement;
