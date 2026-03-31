@@ -91,6 +91,22 @@ const JoinSpyGame = () => {
   const alivePlayers = () => players().filter(p => !dead()[p.id]);
   const isDead      = () => !!dead()[playerId()];
 
+  /* ─────────── auto-join from landing page ─────────── */
+  const tryAutoJoin = () => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const urlSession = params.get("sessionId")?.trim();
+    const storedName = localStorage.getItem("spyName")?.trim();
+    if (urlSession) setSessionId(urlSession);
+    if (storedName) setName(storedName);
+    if (urlSession && storedName) {
+      handleJoin();
+    }
+  };
+
+  // Run auto-join on mount
+  setTimeout(tryAutoJoin, 0);
+
   /* ─────────── join lobby & listeners ─────────── */
   const handleJoin = async () => {
     const { db, fb } = await getFirebase();

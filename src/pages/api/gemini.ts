@@ -10,7 +10,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     if (!GEMINI_API_KEY) {
       console.error("❌ GEMINI_API_KEY is missing.");
-      return new Response(JSON.stringify({ response: "API key not set." }), {
+      return new Response(JSON.stringify({ error: "API key not set.", response: null }), {
         status: 500,
       });
     }
@@ -21,7 +21,7 @@ export const POST: APIRoute = async ({ request }) => {
     const result = await model.generateContent(prompt);
 
     if (!result || !result.response) {
-      return new Response(JSON.stringify({ response: "Empty response from Gemini." }), {
+      return new Response(JSON.stringify({ error: "Empty response from Gemini.", response: null }), {
         status: 500,
       });
     }
@@ -33,7 +33,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   } catch (err: any) {
     console.error("🔥 Gemini API error:", err.message || err);
-    return new Response(JSON.stringify({ response: `Error: ${err.message || "Unknown error"}` }), {
+    return new Response(JSON.stringify({ error: err.message || "Unknown error", response: null }), {
       status: 500,
     });
   }

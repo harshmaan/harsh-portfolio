@@ -80,6 +80,22 @@ const JoinPage = () => {
       .toUpperCase()
       .slice(0, 2);
 
+  /* ─────────── auto-join from landing page ─────────── */
+  const tryAutoJoin = () => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const urlSession = params.get("sessionId")?.trim();
+    const storedName = localStorage.getItem("promptQuestName")?.trim();
+    if (urlSession) setSessionId(urlSession);
+    if (storedName) setName(storedName);
+    if (urlSession && storedName) {
+      handleJoin();
+    }
+  };
+
+  // Run auto-join on mount
+  setTimeout(tryAutoJoin, 0);
+
   /* ─────────── join lobby & listeners ─────────── */
   const handleJoin = async () => {
     if (!name().trim() || !sessionId().trim()) return;
@@ -269,7 +285,7 @@ const JoinPage = () => {
 
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
-        throw new Error(errBody.error || `API returned ${res.status}`);
+        throw new Error(errBody.error || errBody.response || `API returned ${res.status}`);
       }
 
       const data = await res.json();
