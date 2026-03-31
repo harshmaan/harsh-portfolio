@@ -1,17 +1,30 @@
 import { createSignal, Show, For, createEffect, onCleanup } from "solid-js";
 import type { Database, Unsubscribe } from "firebase/database";
 
-// Lazy-load Firebase — only fetched when user actually joins a game
+// Lazy-load Firebase — only fetched once when user joins a game
 let _db: Database | null = null;
 let _fbMod: typeof import("firebase/database") | null = null;
+let _firebaseReady: Promise<{ db: Database; fb: typeof import("firebase/database") }> | null = null;
 
-async function getFirebase() {
+function getFirebase() {
   if (_db && _fbMod) return { db: _db, fb: _fbMod };
-  const { db } = await import("../lib/firebase");
-  const fb = await import("firebase/database");
-  _db = db;
-  _fbMod = fb;
-  return { db, fb };
+  // If already loading, return the in-flight promise
+  if (_firebaseReady) return _firebaseReady;
+  _firebaseReady = (async () => {
+    const [{ db }, fb] = await Promise.all([
+      import("../lib/firebase"),
+      import("firebase/database"),
+    ]);
+    _db = db;
+    _fbMod = fb;
+    return { db, fb };
+  })();
+  return _firebaseReady;
+}
+
+/** Synchronous access — only call after Firebase has been loaded (post-join) */
+function fb() {
+  return { db: _db!, fb: _fbMod! };
 }
 
 /**
@@ -178,19 +191,22 @@ const JoinSpyGame = () => {
 
   /* ─────────── host‑only helpers ─────────── */
   const generatePrompt = async () => {
-    const { db, fb } = await getFirebase();
-    const { ref, set, get } = fb;
+    const { db, fb: f } = fb();
+    const { ref, set, get } = f;
 
-    const res = await fetch("/api/spy-prompt");
-    const { basePrompt, imposterPrompt } = await res.json();
+    // Fetch API prompt and Firebase state in parallel
+    const [promptRes, rolesSnap, playersSnap, deadSnap] = await Promise.all([
+      fetch("/api/spy-prompt"),
+      get(ref(db, `${base()}/roles`)),
+      get(ref(db, `${base()}/players`)),
+      get(ref(db, `${base()}/dead`)),
+    ]);
+    const { basePrompt, imposterPrompt } = await promptRes.json();
     await set(ref(db, `${base()}/basePrompt`), basePrompt);
-  
-    const rolesSnap = await get(ref(db, `${base()}/roles`));
+
     const firstRound = !rolesSnap.exists();
-  
-    const playersSnap = await get(ref(db, `${base()}/players`));
+
     const rosterObj   = playersSnap.exists() ? playersSnap.val() : {};
-    const deadSnap    = await get(ref(db, `${base()}/dead`));
     const deadMap     = deadSnap.exists() ? deadSnap.val() : {};
     const live        = Object.entries(rosterObj)
       .sort((a:any,b:any)=>a[1].joinedAt-b[1].joinedAt)
@@ -226,20 +242,20 @@ const JoinSpyGame = () => {
   };
 
   const startNextRound = async () => {
-    const { db, fb } = await getFirebase();
-    const { ref, set, remove } = fb;
+    const { db, fb: f } = fb();
+    const { ref, set, remove } = f;
 
-    await Promise.all(
-      ["basePrompt","responses","votes","eliminated"].map((k) =>
+    await Promise.all([
+      ...["basePrompt","responses","votes","eliminated"].map((k) =>
         remove(ref(db, `${base()}/${k}`)),
       ),
-    );
-    await set(ref(db, `${base()}/roundId`), crypto.randomUUID());
+      set(ref(db, `${base()}/roundId`), crypto.randomUUID()),
+    ]);
   };
 
   const startNewMatch = async () => {
-    const { db, fb } = await getFirebase();
-    const { ref, set, remove } = fb;
+    const { db, fb: f } = fb();
+    const { ref, set, remove } = f;
 
     await startNextRound();
   
@@ -260,31 +276,31 @@ const JoinSpyGame = () => {
   /* ─────────── player actions ─────────── */
   const handleSubmitResponse = async () => {
     if (isDead()) return;
-    const { db, fb } = await getFirebase();
-    const { ref, set } = fb;
+    setHasSubmitted(true); // optimistic UI — update button instantly
+    const { db, fb: f } = fb();
+    const { ref, set } = f;
     await set(ref(db, `${base()}/responses/${playerId()}`), response());
-    setHasSubmitted(true);
   };
 
-  const handleVote = async (target: string) => {
-    const { db, fb } = await getFirebase();
-    const { ref, set } = fb;
-    await set(ref(db, `${base()}/votes/${playerId()}`), target);
+  const handleVote = (target: string) => {
+    const { db, fb: f } = fb();
+    const { ref, set } = f;
+    set(ref(db, `${base()}/votes/${playerId()}`), target); // fire-and-forget
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     const text = chatInput().trim();
     if (!text) return;
-    const { db, fb } = await getFirebase();
-    const { ref, set } = fb;
+    setChatInput(""); // optimistic UI — clear input instantly
+    const { db, fb: f } = fb();
+    const { ref, set } = f;
     const msgId = crypto.randomUUID();
-    await set(ref(db, `${base()}/chat/${msgId}`), {
+    set(ref(db, `${base()}/chat/${msgId}`), {
       authorId:   playerId(),
       authorName: name(),
       text,
       timestamp:  Date.now(),
-    });
-    setChatInput("");
+    }); // fire-and-forget — listener will update chat
   };
 
   /* ─────────── vote tally & progression (HOST ONLY) ─────────── */
@@ -292,25 +308,33 @@ const JoinSpyGame = () => {
     // Only the host should execute tally to prevent duplicate writes
     if (!isHost()) return;
 
-    const { db, fb } = await getFirebase();
-    const { ref, set, get } = fb;
+    const { db, fb: f } = fb();
+    const { ref, set, get } = f;
 
     const counts: Record<string, number> = {};
     Object.values(votes()).forEach((id) => (counts[id] = (counts[id] || 0) + 1));
     const [topId] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
-    await set(ref(db, `${base()}/eliminated`), topId);
-    await set(ref(db, `${base()}/dead/${topId}`), true);
+
+    // Write eliminated + dead in parallel
+    await Promise.all([
+      set(ref(db, `${base()}/eliminated`), topId),
+      set(ref(db, `${base()}/dead/${topId}`), true),
+    ]);
 
     const roleSnap = await get(ref(db, `${base()}/roles/${topId}`));
     const elimRole = roleSnap.val();
     const remaining = alivePlayers().length;
 
     if (elimRole === "Imposter") {
-      await set(ref(db, `${base()}/winner`), "Collaborators");
-      await set(ref(db, `${base()}/gameOver`), true);
+      await Promise.all([
+        set(ref(db, `${base()}/winner`), "Collaborators"),
+        set(ref(db, `${base()}/gameOver`), true),
+      ]);
     } else if (remaining === 2) { 
-      await set(ref(db, `${base()}/winner`), "Imposter");
-      await set(ref(db, `${base()}/gameOver`), true);
+      await Promise.all([
+        set(ref(db, `${base()}/winner`), "Imposter"),
+        set(ref(db, `${base()}/gameOver`), true),
+      ]);
     } else if (!isDead() && remaining >= 3) {
       await startNextRound();
       await generatePrompt();
