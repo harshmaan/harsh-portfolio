@@ -1,43 +1,154 @@
 ---
-// File: src/pages/prompt-quest/index.astro
+import BasicLayout from "../../layouts/BasicLayout.astro";
 ---
 
-<html lang="en">
-  <body class="bg-black text-white p-6 flex flex-col items-center justify-center min-h-screen">
-    <h1 class="text-3xl font-bold mb-4">🎮 Join Prompt Quest</h1>
-    <form
-      on:submit={(e) => {
-        e.preventDefault();
-        const name = e.target.name.value.trim();
-        const sessionId = e.target.sessionId.value.trim();
+<BasicLayout title="Prompt Quest — Harsh Maan" description="A multiplayer AI-powered storytelling game. Compete with friends through creative, constraint-driven challenges scored by Gemini AI.">
+  <main class="min-h-screen text-white">
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden py-20 px-6">
+      <!-- Subtle radial glow -->
+      <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.08) 0%, transparent 60%);"></div>
 
-        if (name && sessionId) {
-          localStorage.setItem("promptQuestName", name);
-          window.location.href = `/prompt-quest/join?sessionId=${sessionId}`;
-        }
-      }}
-      class="flex flex-col gap-4 w-full max-w-md"
-    >
-      <input
-        type="text"
-        name="name"
-        placeholder="Your name"
-        class="p-3 rounded bg-neutral-800 border border-neutral-600 text-white"
-        required
-      />
-      <input
-        type="text"
-        name="sessionId"
-        placeholder="Session ID"
-        class="p-3 rounded bg-neutral-800 border border-neutral-600 text-white"
-        required
-      />
-      <button
-        type="submit"
-        class="bg-red-600 hover:bg-red-700 py-2 px-4 rounded"
-      >
-        🚀 Play
-      </button>
-    </form>
-  </body>
-</html>
+      <div class="max-w-4xl mx-auto text-center relative z-10">
+        <a href="/" class="text-sm text-gray-400 hover:text-white mb-8 inline-block transition-colors">← Back to Home</a>
+
+        <div class="mb-6">
+          <span class="inline-block text-6xl mb-4 quest-icon">🧩</span>
+        </div>
+
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">Prompt Quest</h1>
+        <p class="text-gray-400 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+          A multiplayer AI-powered storytelling game. Face <em class="text-indigo-400">creative challenges</em>, craft your best response, and let Gemini AI crown the round's champion.
+        </p>
+
+        <!-- Join Form Card -->
+        <div class="max-w-md mx-auto bg-darkslate-500 border border-darkslate-100 rounded-2xl p-8">
+          <h2 class="text-xl font-bold mb-6">Join a Game</h2>
+          <form id="pq-join-form" class="space-y-4">
+            <div>
+              <input
+                type="text"
+                name="name"
+                placeholder="Your name"
+                required
+                class="w-full bg-darkslate-300 border border-darkslate-100 text-white px-4 py-3 rounded-xl outline-none focus:border-indigo-500 transition-colors placeholder:text-gray-500"
+              />
+            </div>
+            <div>
+              <input
+                type="text"
+                name="sessionId"
+                placeholder="Session ID (share with friends)"
+                required
+                class="w-full bg-darkslate-300 border border-darkslate-100 text-white px-4 py-3 rounded-xl outline-none focus:border-indigo-500 transition-colors placeholder:text-gray-500"
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/20 active:scale-[0.98]"
+            >
+              Enter Game →
+            </button>
+          </form>
+          <p class="text-xs text-gray-500 mt-4">First player to join becomes the host</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-16 px-6">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-2xl font-bold text-center mb-12">How It Works</h2>
+
+        <div class="grid gap-6 md:grid-cols-4">
+          <div class="bg-darkslate-500 border border-darkslate-100 rounded-xl p-6 text-center group hover:border-indigo-500/40 transition-all duration-300">
+            <div class="text-3xl mb-3">👥</div>
+            <h3 class="font-bold mb-2">1. Gather</h3>
+            <p class="text-sm text-gray-400">Create a session and share the ID with friends. Everyone joins the same room.</p>
+          </div>
+
+          <div class="bg-darkslate-500 border border-darkslate-100 rounded-xl p-6 text-center group hover:border-indigo-500/40 transition-all duration-300">
+            <div class="text-3xl mb-3">🤖</div>
+            <h3 class="font-bold mb-2">2. AI Prompt</h3>
+            <p class="text-sm text-gray-400">Gemini generates a fun, corporate-themed challenge for the round.</p>
+          </div>
+
+          <div class="bg-darkslate-500 border border-darkslate-100 rounded-xl p-6 text-center group hover:border-indigo-500/40 transition-all duration-300">
+            <div class="text-3xl mb-3">✍️</div>
+            <h3 class="font-bold mb-2">3. Respond</h3>
+            <p class="text-sm text-gray-400">Everyone writes their most creative, funny, or clever response to the challenge.</p>
+          </div>
+
+          <div class="bg-darkslate-500 border border-darkslate-100 rounded-xl p-6 text-center group hover:border-indigo-500/40 transition-all duration-300">
+            <div class="text-3xl mb-3">🏆</div>
+            <h3 class="font-bold mb-2">4. AI Scores</h3>
+            <p class="text-sm text-gray-400">Gemini evaluates every response on creativity, humor, and relevance — highest score wins!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features / Details -->
+    <section class="py-16 px-6 border-t border-darkslate-100">
+      <div class="max-w-4xl mx-auto">
+        <div class="grid gap-6 md:grid-cols-3">
+          <div class="bg-darkslate-500/50 border border-darkslate-100 rounded-xl p-6">
+            <div class="text-sm font-mono text-indigo-400 mb-2">Real-time</div>
+            <h3 class="font-bold mb-2">Multiplayer via Firebase</h3>
+            <p class="text-sm text-gray-400">Instant sync across all players. Responses and scores update live — no refresh needed.</p>
+          </div>
+          <div class="bg-darkslate-500/50 border border-darkslate-100 rounded-xl p-6">
+            <div class="text-sm font-mono text-indigo-400 mb-2">AI-Scored</div>
+            <h3 class="font-bold mb-2">Gemini Evaluation</h3>
+            <p class="text-sm text-gray-400">Every response is scored by AI on creativity, humor, and relevance. Fair, instant, and entertaining.</p>
+          </div>
+          <div class="bg-darkslate-500/50 border border-darkslate-100 rounded-xl p-6">
+            <div class="text-sm font-mono text-indigo-400 mb-2">Creative</div>
+            <h3 class="font-bold mb-2">Workplace Challenges</h3>
+            <p class="text-sm text-gray-400">Corporate-themed prompts that everyone can relate to — convince your boss, outsmart HR, or befriend the intern.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Built With -->
+    <section class="py-12 px-6 border-t border-darkslate-100">
+      <div class="max-w-4xl mx-auto text-center">
+        <p class="text-sm text-gray-500 mb-4">Built with</p>
+        <div class="flex flex-wrap justify-center gap-2">
+          <span class="text-xs bg-darkslate-500 border border-darkslate-100 px-3 py-1.5 rounded-full text-gray-300">SolidJS</span>
+          <span class="text-xs bg-darkslate-500 border border-darkslate-100 px-3 py-1.5 rounded-full text-gray-300">Firebase Realtime DB</span>
+          <span class="text-xs bg-darkslate-500 border border-darkslate-100 px-3 py-1.5 rounded-full text-gray-300">Gemini AI</span>
+          <span class="text-xs bg-darkslate-500 border border-darkslate-100 px-3 py-1.5 rounded-full text-gray-300">Astro SSR</span>
+          <span class="text-xs bg-darkslate-500 border border-darkslate-100 px-3 py-1.5 rounded-full text-gray-300">Netlify Edge</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</BasicLayout>
+
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .quest-icon {
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+  }
+</style>
+
+<script>
+  const form = document.getElementById("pq-join-form") as HTMLFormElement;
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const name = (formData.get("name") as string)?.trim();
+    const sessionId = (formData.get("sessionId") as string)?.trim();
+
+    if (name && sessionId) {
+      localStorage.setItem("promptQuestName", name);
+      window.location.href = `/prompt-quest/join?sessionId=${sessionId}`;
+    }
+  });
+</script>
