@@ -28,15 +28,17 @@ function fbSync() {
 
 const JoinPage = () => {
   /* ─────────── detect auto-join params synchronously (before first render) ─────────── */
-  const _params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const _isClient = typeof window !== "undefined";
+  const _params = _isClient ? new URLSearchParams(window.location.search) : null;
   const _urlSession = _params?.get("sessionId")?.trim() || "";
-  const _storedName = typeof window !== "undefined" ? localStorage.getItem("promptQuestName")?.trim() || "" : "";
+  const _storedName = _isClient ? localStorage.getItem("promptQuestName")?.trim() || "" : "";
   const _shouldAutoJoin = !!(_urlSession && _storedName);
 
   /* ─────────── reactive state ─────────── */
   const [name, setName] = createSignal(_storedName || "");
   const [sessionId, setSessionId] = createSignal(_urlSession || "");
-  const [autoJoining, setAutoJoining] = createSignal(_shouldAutoJoin);
+  const [autoJoining, setAutoJoining] = createSignal(_isClient ? _shouldAutoJoin : true);
+  const [ready, setReady] = createSignal(_isClient);  // false on SSR, true on client
   const [joined, setJoined] = createSignal(false);
   const [playerId, setPlayerId] = createSignal("");
 
@@ -333,8 +335,8 @@ const JoinPage = () => {
   /* ─────────── JSX ─────────── */
   return (
     <div class="max-w-4xl mx-auto px-4 py-8 text-white">
-      {/* ───── Auto-joining spinner (prevents form flash) ───── */}
-      <Show when={autoJoining()}>
+      {/* ───── SSR placeholder — never flash the form on the server ───── */}
+      <Show when={!ready() || autoJoining()}>
         <div class="flex flex-col justify-center items-center min-h-[80vh] gap-4">
           <span class="text-5xl">🧩</span>
           <div class="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
@@ -342,8 +344,8 @@ const JoinPage = () => {
         </div>
       </Show>
 
-      {/* ───── Join Form (only if NOT auto-joining and NOT joined) ───── */}
-      <Show when={!joined() && !autoJoining()}>
+      {/* ───── Join Form (only if client-ready, NOT auto-joining, NOT joined) ───── */}
+      <Show when={ready() && !joined() && !autoJoining()}>
         <div class="flex justify-center items-center min-h-[80vh]">
           <div class="max-w-md w-full">
             {/* Back link */}

@@ -92,15 +92,17 @@ const JoinSpyGame = () => {
   const isDead      = () => !!dead()[playerId()];
 
   /* ─────────── detect auto-join params synchronously (before first render) ─────────── */
-  const _spyParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const _isClient = typeof window !== "undefined";
+  const _spyParams = _isClient ? new URLSearchParams(window.location.search) : null;
   const _spyUrlSession = _spyParams?.get("sessionId")?.trim() || "";
-  const _spyStoredName = typeof window !== "undefined" ? localStorage.getItem("spyName")?.trim() || "" : "";
+  const _spyStoredName = _isClient ? localStorage.getItem("spyName")?.trim() || "" : "";
   const _spyShouldAutoJoin = !!(_spyUrlSession && _spyStoredName);
 
   if (_spyUrlSession) setSessionId(_spyUrlSession);
   if (_spyStoredName) setName(_spyStoredName);
 
-  const [autoJoining, setAutoJoining] = createSignal(_spyShouldAutoJoin);
+  const [autoJoining, setAutoJoining] = createSignal(_isClient ? _spyShouldAutoJoin : true);
+  const [ready, setReady] = createSignal(_isClient);
 
   /* ─────────── join lobby & listeners ─────────── */
   const handleJoin = async () => {
@@ -423,8 +425,8 @@ const JoinSpyGame = () => {
   /* ─────────── JSX layout ─────────── */
   return (
     <div class="max-w-4xl mx-auto px-4 py-8 text-white">
-      {/* ───── Auto-joining spinner (prevents form flash) ───── */}
-      <Show when={autoJoining()}>
+      {/* ───── SSR placeholder — never flash the form on the server ───── */}
+      <Show when={!ready() || autoJoining()}>
         <div class="flex flex-col justify-center items-center min-h-[80vh] gap-4">
           <span class="text-5xl">🕵️</span>
           <div class="w-8 h-8 border-3 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
@@ -432,8 +434,8 @@ const JoinSpyGame = () => {
         </div>
       </Show>
 
-      {/* ───── Join Form (only if NOT auto-joining and NOT joined) ───── */}
-      <Show when={!joined() && !autoJoining()}>
+      {/* ───── Join Form (only if client-ready, NOT auto-joining, NOT joined) ───── */}
+      <Show when={ready() && !joined() && !autoJoining()}>
         <div class="flex justify-center items-center min-h-[80vh]">
           <div class="max-w-md w-full">
             {/* Back link */}
