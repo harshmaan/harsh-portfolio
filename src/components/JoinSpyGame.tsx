@@ -1,6 +1,18 @@
-import { createSignal, Show, For, createEffect } from "solid-js";
-import { db } from "../lib/firebase";
-import { ref, set, onValue, remove, get } from "firebase/database";
+import { createSignal, Show, For, createEffect, onCleanup } from "solid-js";
+import type { Database, Unsubscribe } from "firebase/database";
+
+// Lazy-load Firebase — only fetched when user actually joins a game
+let _db: Database | null = null;
+let _fbMod: typeof import("firebase/database") | null = null;
+
+async function getFirebase() {
+  if (_db && _fbMod) return { db: _db, fb: _fbMod };
+  const { db } = await import("../lib/firebase");
+  const fb = await import("firebase/database");
+  _db = db;
+  _fbMod = fb;
+  return { db, fb };
+}
 
 /**
  * Firebase layout  (added `/dead`)
@@ -47,6 +59,17 @@ const JoinSpyGame = () => {
     { id: string; authorName: string; text: string; timestamp: number }[]
   >([]);
 
+  /* ─────────── listener cleanup tracking ─────────── */
+  const unsubscribers: Unsubscribe[] = [];
+
+  // Helper: subscribe and track for cleanup
+  const track = (unsub: Unsubscribe) => { unsubscribers.push(unsub); };
+
+  onCleanup(() => {
+    unsubscribers.forEach(unsub => unsub());
+    unsubscribers.length = 0;
+  });
+
   /* ─────────── helpers ─────────── */
   const base        = () => `spy/${sessionId()}`;
   const isHost      = () => permaHostId() === playerId();
@@ -55,6 +78,9 @@ const JoinSpyGame = () => {
 
   /* ─────────── join lobby & listeners ─────────── */
   const handleJoin = async () => {
+    const { db, fb } = await getFirebase();
+    const { ref, set, onValue, get } = fb;
+
     const id = crypto.randomUUID();
     setPlayerId(id);
     await set(ref(db, `${base()}/players/${id}`), {
@@ -68,7 +94,7 @@ const JoinSpyGame = () => {
     if (!hostStillHere) await set(ref(db, `${base()}/hostId`), id);   // promote myself
 
     // ───── Chat listener ─────
-    onValue(ref(db, `${base()}/chat`), snap => {
+    track(onValue(ref(db, `${base()}/chat`), snap => {
       const data = snap.val() || {};
       const msgs = Object.entries(data)
         .map(([id, msg]: any) => ({
@@ -79,24 +105,24 @@ const JoinSpyGame = () => {
         }))
         .sort((a, b) => a.timestamp - b.timestamp);
       setChatMessages(msgs);
-    });
+    }));
 
     /* players list (sorted) */
-    onValue(ref(db, `${base()}/players`), snap => {
+    track(onValue(ref(db, `${base()}/players`), snap => {
       const data = snap.val() || {};
       const sorted = Object.entries(data).sort((a:any,b:any)=>a[1].joinedAt-b[1].joinedAt);
       setPlayers(sorted.map(([pid,val]:any) => ({ id: pid, ...val })));
-    });
+    }));
 
-    onValue(ref(db, `${base()}/hostId`), s => {
+    track(onValue(ref(db, `${base()}/hostId`), s => {
       if (s.exists()) setPermaHostId(s.val());
-    });
+    }));
 
     /* graveyard */
-    onValue(ref(db, `${base()}/dead`), snap => setDead(snap.val() || {}));
+    track(onValue(ref(db, `${base()}/dead`), snap => setDead(snap.val() || {})));
 
     /* personal role & prompt */
-    onValue(
+    track(onValue(
       ref(db, `${base()}/roles/${id}`),
       (snap) => {
         if (snap.exists()) {
@@ -105,35 +131,33 @@ const JoinSpyGame = () => {
           setRole(null);
         }
       }
-    );
+    ));
 
-    onValue(ref(db, `${base()}/personalPrompts/${id}`),  s => s.exists() && setPersonalPrompt(s.val()));
+    track(onValue(ref(db, `${base()}/personalPrompts/${id}`),  s => s.exists() && setPersonalPrompt(s.val())));
 
     /* shared state */
-    onValue(ref(db, `${base()}/basePrompt`),  s => s.exists() && setPrompt(s.val()));
-    onValue(ref(db, `${base()}/responses`),   s => {
+    track(onValue(ref(db, `${base()}/basePrompt`),  s => s.exists() && setPrompt(s.val())));
+    track(onValue(ref(db, `${base()}/responses`),   s => {
       const data = s.val() || {};
       setResponses(data);
       if (Object.keys(data).length === alivePlayers().length) setVotingPhase(true);
-    });
-    onValue(ref(db, `${base()}/votes`),       s => setVotes(s.val() || {}));
-    onValue(ref(db, `${base()}/eliminated`),  s => setEliminated(s.exists() ? s.val() : null));
-    onValue(ref(db, `${base()}/gameOver`),    s => setGameOver(s.exists() ? s.val() : false));
-    onValue(ref(db, `${base()}/winner`),      s => setWinner(s.exists() ? s.val() : null));
+    }));
+    track(onValue(ref(db, `${base()}/votes`),       s => setVotes(s.val() || {})));
+    track(onValue(ref(db, `${base()}/eliminated`),  s => setEliminated(s.exists() ? s.val() : null)));
+    track(onValue(ref(db, `${base()}/gameOver`),    s => setGameOver(s.exists() ? s.val() : false)));
+    track(onValue(ref(db, `${base()}/winner`),      s => setWinner(s.exists() ? s.val() : null)));
 
     /* resets */
-    onValue(ref(db, `${base()}/roundId`), s => s.exists() && resetRoundLocal());
-    onValue(ref(db, `${base()}/matchId`), s => {
+    track(onValue(ref(db, `${base()}/roundId`), s => s.exists() && resetRoundLocal()));
+    track(onValue(ref(db, `${base()}/matchId`), s => {
       if (!s.exists()) return;
     
-      /* value has definitely changed (or it’s the first load) */
       const newId = s.val();
-      if (newId === matchId()) return; // already handled
+      if (newId === matchId()) return;
     
-      setMatchId(newId);                     // remember the current match
-      resetMatchLocal();                    // 💥 local wipe, banner disappears immediately
-    });
-
+      setMatchId(newId);
+      resetMatchLocal();
+    }));
   };
 
   const resetRoundLocal = () => {
@@ -145,9 +169,6 @@ const JoinSpyGame = () => {
     setEliminated(null);
     setResponses({});
     setVotes({});
-//    setGameOver(false);   
-//    setWinner(null); 
-//    setRole(null); 
   };
 
   const resetMatchLocal = () => {
@@ -157,16 +178,16 @@ const JoinSpyGame = () => {
 
   /* ─────────── host‑only helpers ─────────── */
   const generatePrompt = async () => {
-    /* 1️⃣ Fetch your prompts from the API */
+    const { db, fb } = await getFirebase();
+    const { ref, set, get } = fb;
+
     const res = await fetch("/api/spy-prompt");
     const { basePrompt, imposterPrompt } = await res.json();
     await set(ref(db, `${base()}/basePrompt`), basePrompt);
   
-    /* 2️⃣ Only assign roles on the very first round of this match */
     const rolesSnap = await get(ref(db, `${base()}/roles`));
     const firstRound = !rolesSnap.exists();
   
-    /* 3️⃣ Build the current live roster */
     const playersSnap = await get(ref(db, `${base()}/players`));
     const rosterObj   = playersSnap.exists() ? playersSnap.val() : {};
     const deadSnap    = await get(ref(db, `${base()}/dead`));
@@ -182,7 +203,6 @@ const JoinSpyGame = () => {
     }
   
     if (firstRound) {
-      // 🔥 First round: pick one Imposter and write /roles + /personalPrompts
       const impIdx = Math.floor(Math.random() * live.length);
       await Promise.all(
         live.map((p, idx) =>
@@ -195,7 +215,6 @@ const JoinSpyGame = () => {
         )
       );
     } else {
-      // 🔄 Subsequent rounds: leave /roles alone, just update personalPrompts
       await Promise.all(
         live.map(async (p) => {
           const roleSnap = await get(ref(db, `${base()}/roles/${p.id}`));
@@ -206,10 +225,10 @@ const JoinSpyGame = () => {
     }
   };
 
-
-
-
   const startNextRound = async () => {
+    const { db, fb } = await getFirebase();
+    const { ref, set, remove } = fb;
+
     await Promise.all(
       ["basePrompt","responses","votes","eliminated"].map((k) =>
         remove(ref(db, `${base()}/${k}`)),
@@ -219,10 +238,11 @@ const JoinSpyGame = () => {
   };
 
   const startNewMatch = async () => {
-    // clear out last match’s per‐round data
+    const { db, fb } = await getFirebase();
+    const { ref, set, remove } = fb;
+
     await startNextRound();
   
-    // now wipe the old roles & prompts so the next match can reassign
     await Promise.all([
       remove(ref(db, `${base()}/roles`)),
       remove(ref(db, `${base()}/personalPrompts`)),
@@ -232,26 +252,31 @@ const JoinSpyGame = () => {
       remove(ref(db, `${base()}/dead`)),
     ]);
   
-    // clear local graveyard immediately
     setDead({});
   
-    // bump the matchId so everyone resets
     await set(ref(db, `${base()}/matchId`), crypto.randomUUID());
   };
 
   /* ─────────── player actions ─────────── */
   const handleSubmitResponse = async () => {
-    if (isDead()) return; // safety guard
+    if (isDead()) return;
+    const { db, fb } = await getFirebase();
+    const { ref, set } = fb;
     await set(ref(db, `${base()}/responses/${playerId()}`), response());
     setHasSubmitted(true);
   };
 
-  const handleVote = (target: string) =>
-    set(ref(db, `${base()}/votes/${playerId()}`), target);
+  const handleVote = async (target: string) => {
+    const { db, fb } = await getFirebase();
+    const { ref, set } = fb;
+    await set(ref(db, `${base()}/votes/${playerId()}`), target);
+  };
 
   const handleSendMessage = async () => {
     const text = chatInput().trim();
     if (!text) return;
+    const { db, fb } = await getFirebase();
+    const { ref, set } = fb;
     const msgId = crypto.randomUUID();
     await set(ref(db, `${base()}/chat/${msgId}`), {
       authorId:   playerId(),
@@ -262,16 +287,20 @@ const JoinSpyGame = () => {
     setChatInput("");
   };
 
-
-  /* ─────────── vote tally & progression ─────────── */
+  /* ─────────── vote tally & progression (HOST ONLY) ─────────── */
   const tallyVotesAndEliminate = async () => {
+    // Only the host should execute tally to prevent duplicate writes
+    if (!isHost()) return;
+
+    const { db, fb } = await getFirebase();
+    const { ref, set, get } = fb;
+
     const counts: Record<string, number> = {};
     Object.values(votes()).forEach((id) => (counts[id] = (counts[id] || 0) + 1));
     const [topId] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
     await set(ref(db, `${base()}/eliminated`), topId);
-    await set(ref(db, `${base()}/dead/${topId}`), true); // persist kill
+    await set(ref(db, `${base()}/dead/${topId}`), true);
 
-    /* check win conditions */
     const roleSnap = await get(ref(db, `${base()}/roles/${topId}`));
     const elimRole = roleSnap.val();
     const remaining = alivePlayers().length;
@@ -318,12 +347,11 @@ const JoinSpyGame = () => {
         {role() === "Imposter" ? "😈 You are the Imposter" : "🫶 You are a Collaborator"}
       </div>
     );
-  // returns an array of player‐names who voted for the given responseId
+
   const votersFor = (responseId: string) =>
     Object.entries(votes())
       .filter(([, targetId]) => targetId === responseId)
       .map(([voterId]) => players().find(p => p.id === voterId)?.name || "Unknown");
-
 
   /* ─────────── JSX layout ─────────── */
   return (

@@ -5,16 +5,7 @@
   <body class="bg-black text-white p-6 flex flex-col items-center justify-center min-h-screen">
     <h1 class="text-3xl font-bold mb-4">🕵️ Join Spy Among Prompts</h1>
     <form
-      on:submit={(e) => {
-        e.preventDefault();
-        const name = e.target.name.value.trim();
-        const sessionId = e.target.sessionId.value.trim();
-
-        if (name && sessionId) {
-          localStorage.setItem("spyName", name); // 🔐 Store locally
-          window.location.href = `/spy/join?sessionId=${sessionId}`;
-        }
-      }}
+      id="spy-join-form"
       class="flex flex-col gap-4 w-full max-w-md"
     >
       <input
@@ -40,3 +31,18 @@
     </form>
   </body>
 </html>
+
+<script>
+  const form = document.getElementById("spy-join-form") as HTMLFormElement;
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const name = (formData.get("name") as string)?.trim();
+    const sessionId = (formData.get("sessionId") as string)?.trim();
+
+    if (name && sessionId) {
+      localStorage.setItem("spyName", name);
+      window.location.href = `/spy/join?sessionId=${sessionId}`;
+    }
+  });
+</script>

@@ -1,9 +1,11 @@
-import { onMount } from "solid-js";
-import * as d3 from "d3";
-import worldData from "../lib/world.json";
+import { onMount, onCleanup } from "solid-js";
+import { geoOrthographic, geoPath } from "d3-geo";
+import { select } from "d3-selection";
+import { timer, type Timer } from "d3-timer";
 
 const GlobeComponent = () => {
   let mapContainer: HTMLDivElement | undefined;
+  let globeTimer: Timer | undefined;
 
   const visitedCountries = [
     "United Arab Emirates",
@@ -13,25 +15,26 @@ const GlobeComponent = () => {
     "India",
   ];
 
-  onMount(() => {
+  onMount(async () => {
     if (!mapContainer) return;
+
+    // Dynamically import world.json so it's not in the main bundle
+    const worldData = (await import("../lib/world.json")).default;
 
     const width = mapContainer.clientWidth;
     const height = 500;
     const sensitivity = 75;
 
-    let projection = d3
-      .geoOrthographic()
+    let projection = geoOrthographic()
       .scale(250)
       .center([0, 0])
       .rotate([0, -30])
       .translate([width / 2, height / 2]);
 
     const initialScale = projection.scale();
-    let pathGenerator = d3.geoPath().projection(projection);
+    let pathGenerator = geoPath().projection(projection);
 
-    let svg = d3
-      .select(mapContainer)
+    let svg = select(mapContainer)
       .append("svg")
       .attr("width", width)
       .attr("height", height);
@@ -62,12 +65,16 @@ const GlobeComponent = () => {
       .style("stroke-width", 0.3)
       .style("opacity", 0.8);
 
-    d3.timer(() => {
+    globeTimer = timer(() => {
       const rotate = projection.rotate();
       const k = sensitivity / projection.scale();
       projection.rotate([rotate[0] - 1 * k, rotate[1]]);
       svg.selectAll("path").attr("d", (d: any) => pathGenerator(d as any));
     }, 200);
+  });
+
+  onCleanup(() => {
+    if (globeTimer) globeTimer.stop();
   });
 
   return (

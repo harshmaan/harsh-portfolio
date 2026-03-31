@@ -24,20 +24,36 @@ const posts = (await getCollection("blog"))?.sort(
   import { loaderAnimation } from "../lib/constants";
   const cards = document.querySelectorAll(".card");
 
-  const sequence = [
-    loaderAnimation,
-    [
-      cards,
-      { y: ["40%", "0%"], opacity: [0, 1] },
-      {
-        type: "spring",
-        at: "-0.1",
-        delay: stagger(0.3),
-      },
-    ],
-  ];
+  const isRepeatVisit = sessionStorage.getItem("hasVisited");
 
-  animate(sequence as AnimationSequence);
+  if (isRepeatVisit) {
+    // Skip loader on repeat visits — show content immediately
+    const loader = document.querySelector(".loader") as HTMLElement;
+    if (loader) {
+      loader.style.opacity = "0";
+      loader.style.pointerEvents = "none";
+    }
+    cards.forEach((card) => {
+      (card as HTMLElement).style.opacity = "1";
+    });
+  } else {
+    sessionStorage.setItem("hasVisited", "true");
+
+    const sequence = [
+      loaderAnimation,
+      [
+        cards,
+        { y: ["40%", "0%"], opacity: [0, 1] },
+        {
+          type: "spring",
+          at: "-0.1",
+          delay: stagger(0.3),
+        },
+      ],
+    ];
+
+    animate(sequence as AnimationSequence);
+  }
 </script>
 
 <Layout
@@ -60,7 +76,7 @@ const posts = (await getCollection("blog"))?.sort(
       title="Countries I visited"
     >
       <div class="h-full w-full absolute inset-0 -z-10">
-        <Globe client:load />
+        <Globe client:idle />
       </div>
     </Card>
     <Card
