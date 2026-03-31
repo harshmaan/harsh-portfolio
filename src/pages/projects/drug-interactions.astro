@@ -1,0 +1,19 @@
+---
+import BasicLayout from "../../layouts/BasicLayout.astro";
+import DrugInteractionChecker from "../../components/DrugInteractionChecker.tsx";
+---
+
+<BasicLayout title="Drug Interaction Checker — Harsh Maan" description="AI-powered drug-drug interaction analysis with severity ratings and network visualization.">
+  <main class="p-6 max-w-5xl mx-auto text-white min-h-screen py-12">
+    <a href="/projects" class="text-sm text-gray-400 hover:text-white mb-6 inline-block">← Back to Projects</a>
+
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold mb-2">💊 Drug Interaction Checker</h1>
+      <p class="text-gray-400 max-w-2xl">
+        Enter two or more drug names to analyze potential interactions, contraindications, and mechanisms of action. Powered by Gemini AI with D3 network visualization.
+      </p>
+    </div>
+
+    <DrugInteractionChecker client:load />
+  </main>
+</BasicLayout>

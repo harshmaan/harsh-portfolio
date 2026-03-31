@@ -1,0 +1,19 @@
+---
+import BasicLayout from "../../layouts/BasicLayout.astro";
+import LiteratureRAG from "../../components/LiteratureRAG.tsx";
+---
+
+<BasicLayout title="Medical Literature RAG — Harsh Maan" description="Upload a research paper, embed it with Gemini, and ask questions with AI-grounded answers.">
+  <main class="p-6 max-w-5xl mx-auto text-white min-h-screen py-12">
+    <a href="/projects" class="text-sm text-gray-400 hover:text-white mb-6 inline-block">← Back to Projects</a>
+
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold mb-2">📄 Medical Literature RAG</h1>
+      <p class="text-gray-400 max-w-2xl">
+        Upload a research paper (PDF or TXT) → the system chunks and embeds it → then ask natural language questions and get AI-generated answers grounded in the paper with citations.
+      </p>
+    </div>
+
+    <LiteratureRAG client:load />
+  </main>
+</BasicLayout>

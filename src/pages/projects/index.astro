@@ -1,0 +1,58 @@
+---
+import BasicLayout from "../../layouts/BasicLayout.astro";
+---
+
+<BasicLayout title="AI Projects — Harsh Maan" description="Domain-specific AI tools for the pharma & healthcare space.">
+  <main class="p-6 max-w-5xl mx-auto text-white min-h-screen flex flex-col justify-center">
+    <a href="/" class="text-sm text-gray-400 hover:text-white mb-6 inline-block">← Back to Home</a>
+
+    <h1 class="text-3xl font-bold mb-2">AI Projects</h1>
+    <p class="text-gray-400 mb-10 max-w-2xl">
+      Domain-specific AI tools built for the pharma &amp; healthcare space — powered by Gemini, ClinicalTrials.gov API, and in-browser vector search.
+    </p>
+
+    <div class="grid gap-6 md:grid-cols-3">
+      <!-- Drug Interaction Checker -->
+      <a href="/projects/drug-interactions" class="group block bg-darkslate-500 border border-darkslate-100 hover:border-primary-500 rounded-xl p-6 transition-all duration-200">
+        <div class="text-3xl mb-4">💊</div>
+        <h2 class="text-lg font-bold mb-2 group-hover:text-primary-500 transition-colors">Drug Interaction Checker</h2>
+        <p class="text-sm text-gray-400 mb-4">
+          Enter 2+ drug names → AI explains interactions, contraindications, severity, and mechanisms of action.
+        </p>
+        <div class="flex flex-wrap gap-1">
+          <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">Gemini</span>
+          <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">Pharma AI</span>
+          <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">D3 Graph</span>
+        </div>
+      </a>
+
+      <!-- Clinical Trial Summarizer -->
+      <a href="/projects/clinical-trials" class="group block bg-darkslate-500 border border-darkslate-100 hover:border-primary-500 rounded-xl p-6 transition-all duration-200">
+        <div class="text-3xl mb-4">🔬</div>
+        <h2 class="text-lg font-bold mb-2 group-hover:text-primary-500 transition-colors">Clinical Trial Summarizer</h2>
+        <p class="text-sm text-gray-400 mb-4">
+          Paste a ClinicalTrials.gov NCT ID → auto-fetches trial data → Gemini summarizes it in plain English.
+        </p>
+        <div class="flex flex-wrap gap-1">
+          <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">Gemini</span>
+          <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">ClinicalTrials API</span>
+          <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">RAG Pipeline</span>
+        </div>
+      </a>
+
+      <!-- Medical Literature RAG -->
+      <a href="/projects/literature-rag" class="group block bg-darkslate-500 border border-darkslate-100 hover:border-primary-500 rounded-xl p-6 transition-all duration-200">
+        <div class="text-3xl mb-4">📄</div>
+        <h2 class="text-lg font-bold mb-2 group-hover:text-primary-500 transition-colors">Medical Literature RAG</h2>
+        <p class="text-sm text-gray-400 mb-4">
+          Upload a research paper PDF → chunks &amp; embeds it → ask questions in natural language → AI answers with citations.
+        </p>
+        <div class="flex flex-wrap gap-1">
+          <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">Gemini</span>
+          <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">Vector Search</span>
+          <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">PDF Parsing</span>
+        </div>
+      </a>
+    </div>
+  </main>
+</BasicLayout>
