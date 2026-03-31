@@ -27,9 +27,16 @@ function fbSync() {
 }
 
 const JoinPage = () => {
+  /* ─────────── detect auto-join params synchronously (before first render) ─────────── */
+  const _params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const _urlSession = _params?.get("sessionId")?.trim() || "";
+  const _storedName = typeof window !== "undefined" ? localStorage.getItem("promptQuestName")?.trim() || "" : "";
+  const _shouldAutoJoin = !!(_urlSession && _storedName);
+
   /* ─────────── reactive state ─────────── */
-  const [name, setName] = createSignal("");
-  const [sessionId, setSessionId] = createSignal("");
+  const [name, setName] = createSignal(_storedName || "");
+  const [sessionId, setSessionId] = createSignal(_urlSession || "");
+  const [autoJoining, setAutoJoining] = createSignal(_shouldAutoJoin);
   const [joined, setJoined] = createSignal(false);
   const [playerId, setPlayerId] = createSignal("");
 
@@ -79,22 +86,6 @@ const JoinPage = () => {
       .join("")
       .toUpperCase()
       .slice(0, 2);
-
-  /* ─────────── auto-join from landing page ─────────── */
-  const tryAutoJoin = () => {
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    const urlSession = params.get("sessionId")?.trim();
-    const storedName = localStorage.getItem("promptQuestName")?.trim();
-    if (urlSession) setSessionId(urlSession);
-    if (storedName) setName(storedName);
-    if (urlSession && storedName) {
-      handleJoin();
-    }
-  };
-
-  // Run auto-join on mount
-  setTimeout(tryAutoJoin, 0);
 
   /* ─────────── join lobby & listeners ─────────── */
   const handleJoin = async () => {
@@ -185,6 +176,11 @@ const JoinPage = () => {
       setJoinError(err?.message || "Something went wrong while joining.");
     }
   };
+
+  /* ─────────── auto-join from landing page (fires immediately, no flash) ─────────── */
+  if (_shouldAutoJoin) {
+    handleJoin().then(() => setAutoJoining(false), () => setAutoJoining(false));
+  }
 
   /* ─────────── host: auto-score when all responded ─────────── */
   createEffect(() => {
@@ -337,8 +333,17 @@ const JoinPage = () => {
   /* ─────────── JSX ─────────── */
   return (
     <div class="max-w-4xl mx-auto px-4 py-8 text-white">
-      {/* ───── Join Form ───── */}
-      <Show when={!joined()}>
+      {/* ───── Auto-joining spinner (prevents form flash) ───── */}
+      <Show when={autoJoining()}>
+        <div class="flex flex-col justify-center items-center min-h-[80vh] gap-4">
+          <span class="text-5xl">🧩</span>
+          <div class="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <p class="text-gray-400 text-sm">Joining session…</p>
+        </div>
+      </Show>
+
+      {/* ───── Join Form (only if NOT auto-joining and NOT joined) ───── */}
+      <Show when={!joined() && !autoJoining()}>
         <div class="flex justify-center items-center min-h-[80vh]">
           <div class="max-w-md w-full">
             {/* Back link */}

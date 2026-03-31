@@ -91,21 +91,16 @@ const JoinSpyGame = () => {
   const alivePlayers = () => players().filter(p => !dead()[p.id]);
   const isDead      = () => !!dead()[playerId()];
 
-  /* ─────────── auto-join from landing page ─────────── */
-  const tryAutoJoin = () => {
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    const urlSession = params.get("sessionId")?.trim();
-    const storedName = localStorage.getItem("spyName")?.trim();
-    if (urlSession) setSessionId(urlSession);
-    if (storedName) setName(storedName);
-    if (urlSession && storedName) {
-      handleJoin();
-    }
-  };
+  /* ─────────── detect auto-join params synchronously (before first render) ─────────── */
+  const _spyParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const _spyUrlSession = _spyParams?.get("sessionId")?.trim() || "";
+  const _spyStoredName = typeof window !== "undefined" ? localStorage.getItem("spyName")?.trim() || "" : "";
+  const _spyShouldAutoJoin = !!(_spyUrlSession && _spyStoredName);
 
-  // Run auto-join on mount
-  setTimeout(tryAutoJoin, 0);
+  if (_spyUrlSession) setSessionId(_spyUrlSession);
+  if (_spyStoredName) setName(_spyStoredName);
+
+  const [autoJoining, setAutoJoining] = createSignal(_spyShouldAutoJoin);
 
   /* ─────────── join lobby & listeners ─────────── */
   const handleJoin = async () => {
@@ -190,6 +185,11 @@ const JoinSpyGame = () => {
       resetMatchLocal();
     }));
   };
+
+  /* ─────────── auto-join from landing page (fires immediately, no flash) ─────────── */
+  if (_spyShouldAutoJoin) {
+    handleJoin().then(() => setAutoJoining(false), () => setAutoJoining(false));
+  }
 
   const resetRoundLocal = () => {
     setVotingPhase(false);
@@ -423,8 +423,17 @@ const JoinSpyGame = () => {
   /* ─────────── JSX layout ─────────── */
   return (
     <div class="max-w-4xl mx-auto px-4 py-8 text-white">
-      {/* ───── Join Form ───── */}
-      <Show when={!joined()}>
+      {/* ───── Auto-joining spinner (prevents form flash) ───── */}
+      <Show when={autoJoining()}>
+        <div class="flex flex-col justify-center items-center min-h-[80vh] gap-4">
+          <span class="text-5xl">🕵️</span>
+          <div class="w-8 h-8 border-3 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+          <p class="text-gray-400 text-sm">Joining session…</p>
+        </div>
+      </Show>
+
+      {/* ───── Join Form (only if NOT auto-joining and NOT joined) ───── */}
+      <Show when={!joined() && !autoJoining()}>
         <div class="flex justify-center items-center min-h-[80vh]">
           <div class="max-w-md w-full">
             {/* Back link */}
