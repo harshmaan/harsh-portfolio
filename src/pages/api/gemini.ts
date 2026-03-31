@@ -16,7 +16,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
     const result = await model.generateContent(prompt);
 
@@ -33,7 +33,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   } catch (err: any) {
     console.error("🔥 Gemini API error:", err.message || err);
-    return new Response(JSON.stringify({ response: "Internal error occurred." }), {
+    return new Response(JSON.stringify({ response: `Error: ${err.message || "Unknown error"}` }), {
       status: 500,
     });
   }
